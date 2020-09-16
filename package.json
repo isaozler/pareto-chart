@@ -1,6 +1,6 @@
 {
-  "name": "pareto-chart",
-  "version": "0.0.1",
+  "name": "io-pareto-chart",
+  "version": "0.0.2",
   "description": "A Pareto Chart plugin for Grafana",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
