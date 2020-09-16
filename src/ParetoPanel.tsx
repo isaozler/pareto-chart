@@ -21,7 +21,6 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
   const { fields } = serie;
   const [xData, yData] = fields;
   let yValues: number[] = yData.values.toArray();
-  // yValues = [92, 83, 75, 59, 53, 27, 16, 9, 7, 4, 3, 1];
   const yValuesSum: number = yValues.reduce((a, d) => a + d, 0);
   let xValues: string[] = xData.values.toArray().map((d, i) => `T${i + 1}`);
   const graphData: GraphData = yValues
