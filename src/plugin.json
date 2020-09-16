@@ -1,6 +1,6 @@
 {
   "type": "panel",
-  "name": "pareto-chart",
+  "name": "Pareto Chart",
   "id": "pareto-chart",
   "info": {
     "description": "Pareto Chart for Grafana",
@@ -8,7 +8,9 @@
       "name": "Isa Ozler",
       "url": "isaozler.com"
     },
-    "keywords": [],
+    "keywords": [
+      "grafana", "pareto", "chart"
+    ],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"
