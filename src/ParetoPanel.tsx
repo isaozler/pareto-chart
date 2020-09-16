@@ -114,11 +114,11 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
                       setIssetVitalFewLine(true) && (
                         <line
                           className={styles.lineCutOff}
-                          transform={`translate(${padding + x.bandwidth() / 2}, 0)`}
+                          transform={`translate(${0}, 0)`}
                           ref={node => {
                             d3.select(node)
-                              .attr('x1', currentX - x.bandwidth())
-                              .attr('x2', currentX - x.bandwidth())
+                              .attr('x1', currentX + x.bandwidth() / 2)
+                              .attr('x2', currentX + x.bandwidth() / 2)
                               .attr('y1', 0)
                               .attr('y2', chartHeight);
                           }}
