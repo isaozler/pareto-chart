@@ -1,7 +1,7 @@
 {
   "type": "panel",
   "name": "Pareto Chart",
-  "id": "io-pareto-chart-plugin",
+  "id": "isaozler-pareto-chart-panel",
   "info": {
     "description": "Pareto Chart for Grafana",
     "author": {
