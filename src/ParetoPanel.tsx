@@ -66,7 +66,7 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
         .style('top', `${event.pageY - 28}px`);
       d3.select(tooltipContentDiv)
         .style('background', isVital === 'true' ? theme.palette.greenBase : theme.palette.redBase)
-        .html(`${label}: <strong>${count}</strong>`);
+        .html(`${label}<strong>${count}</strong>`);
     }
   };
 
@@ -207,14 +207,32 @@ const getStyles = stylesFactory(() => {
     tooltipContainer: css`
       position: fixed;
       z-index: 100;
+      min-width: 20vw;
+      display: flex;
     `,
     tooltip: css`
       position: absolute;
       bottom: 0;
       left: 0;
-      max-width: 200px;
       border: 1px solid ${theme.colors.border2};
-      padding: 4px;
+      padding: 4px 10px;
+      max-width: 100%;
+
+      strong {
+        position: absolute;
+        top: -1px;
+        left: 100%;
+        padding: 4px;
+        bottom: -1px;
+        min-width: 50px;
+        text-align: center;
+        background: inherit;
+        border: 1px solid ${theme.colors.border2};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+      }
     `,
     textBox: css`
       position: absolute;
