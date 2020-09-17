@@ -4,39 +4,16 @@ import { ParetoOptions } from 'types';
 import { css, cx } from 'emotion';
 import * as d3 from 'd3';
 import { stylesFactory, useTheme } from '@grafana/ui';
+import { PanelDataController } from './controllers';
 
 interface Props extends PanelProps<ParetoOptions> {}
-interface GraphData {
-  x: string[];
-  y: number[];
-  p: number[];
-  [key: string]: any;
-}
 
 export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) => {
   const theme = useTheme();
   const styles = getStyles();
   const { vitalBreakpointVal, showVitalFew, showBottomAxis } = options;
-  const [serie] = data.series;
-  const { fields } = serie;
-  const [xData, yData] = fields;
-  let yValues: number[] = yData.values.toArray();
-  const yValuesSum: number = yValues.reduce((a, d) => a + d, 0);
-  let xValues: string[] = xData.values.toArray().map((d, i) => `T${i + 1}`);
-  const graphData: GraphData = yValues
-    .map((d, i) => ({ x: xValues[i], y: d }))
-    .sort((a, b) => b.y - a.y)
-    .reduce(
-      (result: GraphData, d, i) => {
-        return {
-          ...result,
-          x: [...result.x, d.x],
-          y: [...result.y, d.y],
-          p: [...result.p, (result?.p[i - 1] ? result.p[i - 1] : 0) + (d.y * 100) / yValuesSum],
-        };
-      },
-      { x: [], y: [], p: [] }
-    );
+  const PanelData = new PanelDataController(data);
+  const graphData = PanelData.getResults();
   const maxYOffsetVal = d3.max(graphData.y) || 0;
   const minYOffsetVal = d3.min(graphData.y) || 0;
   const padding = 20;
