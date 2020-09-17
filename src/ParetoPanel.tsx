@@ -217,6 +217,7 @@ const getStyles = stylesFactory(() => {
       border: 1px solid ${theme.colors.border2};
       padding: 4px 10px;
       max-width: 100%;
+      color: white;
 
       strong {
         position: absolute;
@@ -245,7 +246,7 @@ const getStyles = stylesFactory(() => {
     `,
     line: css`
       fill: none;
-      stroke: white;
+      stroke: ${theme.isDark ? 'rgba(255,255,255,.5)' : 'rgba(0,0,0,.5)'};
       stroke-width: 2px;
     `,
     lineCutOff: css`
