@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { PanelProps } from '@grafana/data';
 import { ParetoOptions } from 'types';
 import { css, cx } from 'emotion';
@@ -9,8 +9,14 @@ import { PanelDataController } from './controllers';
 interface Props extends PanelProps<ParetoOptions> {}
 
 export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) => {
+  if (!data || !!!data.series.length) {
+    return <>No Data</>;
+  }
+
   const theme = useTheme();
   const styles = getStyles();
+  const tooltipRef = useRef(null);
+  const tooltipContentRef = useRef(null);
   const { vitalBreakpointVal, showVitalFew, showBottomAxis } = options;
   const PanelData = new PanelDataController(data);
   const graphData = PanelData.getResults();
@@ -25,7 +31,6 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
     .padding(options.barPadding);
   const y = d3.scaleLinear().rangeRound([chartHeight, 0]);
   const p = d3.scaleLinear().rangeRound([chartHeight, 0]);
-
   const lineX = d3
     .scaleBand()
     .rangeRound([0, chartWidth])
@@ -48,6 +53,22 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
     issetVitalFewLine = state;
     return true;
   };
+  const tooltipHandler = (event: React.MouseEvent<SVGRectElement, MouseEvent>) => {
+    const { current: tooltipDiv } = tooltipRef || { current: null };
+    const { current: tooltipContentDiv } = tooltipContentRef || { current: null };
+    const { label, isVital, count } = event.currentTarget?.dataset || {};
+    const isVisible = ['mouseover', 'mousemove'].includes(event.type) ? true : false;
+
+    if (!!tooltipDiv) {
+      d3.select(tooltipDiv)
+        .style('opacity', isVisible ? 0.9 : 0)
+        .style('left', `${event.pageX}px`)
+        .style('top', `${event.pageY - 28}px`);
+      d3.select(tooltipContentDiv)
+        .style('background', isVital === 'true' ? theme.palette.greenBase : theme.palette.redBase)
+        .html(`${label}: <strong>${count}</strong>`);
+    }
+  };
 
   x.domain(graphData.x);
   y.domain([minYOffsetVal - barHeightOffset, maxYOffsetVal + barHeightOffset]);
@@ -63,6 +84,9 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
         `
       )}
     >
+      <div ref={tooltipRef} className={styles.tooltipContainer}>
+        <div ref={tooltipContentRef} className={styles.tooltip} />
+      </div>
       <svg
         className={styles.svg}
         width={width}
@@ -78,11 +102,18 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
               return (
                 <>
                   <rect
+                    className={styles.bar}
                     x={currentX}
                     y={y(value)}
                     width={x.bandwidth()}
                     height={chartHeight - y(value)}
                     fill={graphData.p[i] > vitalBreakpointVal ? theme.palette.redBase : theme.palette.greenBase}
+                    data-label={graphData.x[i]}
+                    data-count={value}
+                    data-is-vital={graphData.p[i] < vitalBreakpointVal}
+                    onMouseOver={tooltipHandler}
+                    onMouseMove={tooltipHandler}
+                    onMouseOut={tooltipHandler}
                   />
                   <>
                     {graphData.p[i] > vitalBreakpointVal &&
@@ -162,6 +193,8 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
 };
 
 const getStyles = stylesFactory(() => {
+  const theme = useTheme();
+
   return {
     wrapper: css`
       position: relative;
@@ -171,11 +204,26 @@ const getStyles = stylesFactory(() => {
       top: 0;
       left: 0;
     `,
+    tooltipContainer: css`
+      position: fixed;
+      z-index: 100;
+    `,
+    tooltip: css`
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      max-width: 200px;
+      border: 1px solid ${theme.colors.border2};
+      padding: 4px;
+    `,
     textBox: css`
       position: absolute;
       bottom: 0;
       left: 0;
       padding: 10px;
+    `,
+    bar: css`
+      cursor: pointer;
     `,
     line: css`
       fill: none;
