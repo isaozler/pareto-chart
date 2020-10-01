@@ -1,12 +1,13 @@
 {
   "type": "panel",
   "name": "Pareto Chart",
-  "id": "isaozler-pareto-chart-panel",
+  "id": "isaozler-paretochart-panel",
   "info": {
     "description": "Pareto Chart for Grafana",
     "author": {
       "name": "Isa Ozler",
-      "url": "isaozler.com"
+      "url": "https://isaozler.com",
+      "email": "contactme@isaozler.com"
     },
     "keywords": [
       "grafana", "pareto", "chart"
@@ -21,7 +22,8 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaVersion": "7.0.x",
+    "grafanaDependency": ">=7.0.0",
+    "grafanaVersion": "7.x",
     "plugins": []
   }
 }
