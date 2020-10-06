@@ -45,6 +45,35 @@ export const getStyles = stylesFactory(() => {
         justify-content: center;
         font-size: 1.4rem;
       }
+
+      label {
+        display: block;
+        background: inherit;
+        padding: 0 0 4px 0;
+
+        &.label-header {
+          font-weight: bold;
+          font-size: 1.2rem;
+          max-width: 100%;
+        }
+      }
+
+      .tooltip-copy-label {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        background: ${theme.colors.border2};
+        color: ${theme.colors.text};
+        font-size: 10px;
+        height: 20px;
+        box-sizing: border-box;
+        padding: 2px 4px;
+
+        &.hidden {
+          opacity: 0;
+          z-index: -1;
+        }
+      }
     `,
     textBox: css`
       position: absolute;
@@ -54,6 +83,14 @@ export const getStyles = stylesFactory(() => {
     `,
     bar: css`
       cursor: pointer;
+
+      &:hover {
+        fill: ${theme.colors.text};
+      }
+    `,
+    barValue: css`
+      fill: ${theme.colors.text};
+      text-anchor: middle;
     `,
     line: css`
       fill: none;

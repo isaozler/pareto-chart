@@ -1,3 +1,4 @@
+import { FieldType } from '@grafana/data';
 export interface GraphData {
   x: string[];
   y: number[];
@@ -32,8 +33,8 @@ export class PanelDataController {
   }
 
   private setTableData(fields: any) {
-    const xData = fields.find(({ name }: { name: string }) => name === 'x');
-    const yData = fields.find(({ name }: { name: string }) => name === 'y');
+    const xData = fields.find(({ type }: { type: string }) => type === FieldType.string);
+    const yData = fields.find(({ type }: { type: string }) => type === FieldType.number);
     const xValues: string[] = xData.values.toArray().map((d: any, i: number) => `${d}`);
     const yValues: number[] = yData.values.toArray();
     return this.setResults(xValues, yValues, this.sumYVals(yValues));
@@ -78,19 +79,20 @@ export class PanelDataController {
         (result: GraphData, d, i) => {
           const xPercentage = (d.y * 100) / yValuesSum;
           const percentage = (result?.p[i - 1] ? result.p[i - 1] : 0) + xPercentage;
-          const xLabel = i === yValues.length - 1 ? `${percentage.toFixed(0)} %` : `${percentage.toFixed(2)} %`;
+          const xAxisLabels =
+            i === yValues.length - 1 ? `${Math.trunc(Math.ceil(percentage))} %` : `${percentage.toFixed(2)} %`;
           const tooltipLabel = `${xPercentage.toFixed(2)} %`;
 
           return {
             ...result,
-            x: [...result.x, xLabel],
+            x: [...result.x, d.x],
             y: [...result.y, d.y],
             p: [...result.p, percentage],
-            yLabel: [...result.yLabel, d.y.toFixed(2)],
+            xAxisLabels: [...result.xAxisLabels, xAxisLabels],
             tooltipLabel: [...result.tooltipLabel, tooltipLabel],
           };
         },
-        { x: [], y: [], p: [], yLabel: [], tooltipLabel: [] }
+        { x: [], y: [], p: [], xAxisLabels: [], tooltipLabel: [] }
       );
     return this.results;
   }
