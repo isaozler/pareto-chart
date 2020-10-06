@@ -15,7 +15,9 @@
       "large": "img/logo.svg"
     },
     "links": [],
-    "screenshots": [],
+    "screenshots": [
+      { "name": "Pareto Chart Example", "path": "img/pareto-chart-screenshot.png" }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
