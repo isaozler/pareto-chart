@@ -1,12 +1,10 @@
 # Grafana Pareto Panel Plugin
 
-[Screenshot of plugin](./src/img/pareto-chart-screenshot.png)
+[Screenshot of plugin](https://raw.githubusercontent.com/isaozler/pareto-chart/releases/latest/src/img/pareto-chart-screenshot.png)
 
 ## Getting started
 
-This plugin provides you the ability to draw a Pareto chart with `RDB` and `TimeSeries databases`. **TimeSeries** collections don't need any configurations except the mappings. The first col will always be datetime and the second column will be the numeric value.
-
-With **relational databases** we do need to select the right columns. For this, it's enough to just have the columns you want to visualize as the first two selects like shown below.
+This plugin provides you the ability to draw a Pareto chart with `RDB` and `TimeSeries databases`.
 
 ### MySQL Sample
 
@@ -17,6 +15,7 @@ Provide the `defects` which could be "categories" (type **string**) for example 
 | Error 1 | 10 |
 | Error 2 | 4 |
 | Error 3 | 1 |
+| ... | ... |
 
 ## Sample Query
 

@@ -35,21 +35,21 @@ export class PanelDataController {
   private setTableData(fields: any) {
     const xData = fields.find(({ type }: { type: string }) => type === FieldType.string);
     const yData = fields.find(({ type }: { type: string }) => type === FieldType.number);
-    const xValues: string[] = xData.values.toArray().map((d: any, i: number) => `${d}`);
+    const xValues: string[] = xData.values.toArray().map((d: any) => `${d}`);
     const yValues: number[] = yData.values.toArray();
     return this.setResults(xValues, yValues, this.sumYVals(yValues));
   }
 
   private setSeriesData(fields: any) {
     const [xData, yData] = fields;
-    const xValues: string[] = xData.values.toArray().map((d: any, i: number) => i);
+    const xValues: string[] = xData.values.toArray().map((d: any) => d);
     const yValues: number[] = yData.values.toArray();
     return this.setResults(xValues, yValues, this.sumYVals(yValues));
   }
 
   private setTimeSeriesData(series: any) {
-    const xValues: string[] = series.map(({ name }: { name: string }, i: number) => this.stripName(name));
-    const yValues: number[] = series.map(({ fields }: { fields: any }, i: number) => {
+    const xValues: string[] = series.map(({ name }: { name: string }) => this.stripName(name));
+    const yValues: number[] = series.map(({ fields }: { fields: any }) => {
       const [, val]: [any, any] = fields;
       const [response]: [number] = val.values.toArray();
       return response;
