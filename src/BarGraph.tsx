@@ -76,8 +76,8 @@ export function BarGraph(
       d3Select(tooltipContentDiv).style(
         'background',
         isVital === 'true' ? theme.palette.greenBase : theme.palette.redBase
-      ).html(`<label class="label-header">${labelHeader} ${!!contents.copyText &&
-        getCopyLabel(contents.copyText)}</label>
+      ).html(`<label class="label-header">${labelHeader}
+        ${!!contents.copyText ? getCopyLabel(contents.copyText) : ''}</label>
         <label class="label-value">Percentage of sum: ${labelValue}</label>
         <strong>${count}</strong>
       `);
