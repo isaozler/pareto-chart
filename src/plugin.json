@@ -9,9 +9,7 @@
       "url": "https://isaozler.com",
       "email": "contactme@isaozler.com"
     },
-    "keywords": [
-      "grafana", "pareto", "chart"
-    ],
+    "keywords": ["grafana", "pareto", "chart"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"

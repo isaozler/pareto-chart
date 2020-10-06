@@ -1,4 +1,4 @@
-interface GraphData {
+export interface GraphData {
   x: string[];
   y: number[];
   p: number[];
@@ -41,7 +41,7 @@ export class PanelDataController {
 
   private setSeriesData(fields: any) {
     const [xData, yData] = fields;
-    const xValues: string[] = xData.values.toArray().map((d: any, i: number) => `T${i + 1}`);
+    const xValues: string[] = xData.values.toArray().map((d: any, i: number) => i);
     const yValues: number[] = yData.values.toArray();
     return this.setResults(xValues, yValues, this.sumYVals(yValues));
   }
@@ -72,18 +72,25 @@ export class PanelDataController {
 
   private setResults(xValues: string[], yValues: number[], yValuesSum: number) {
     this.results = yValues
-      .map((d, i) => ({ x: xValues[i], y: d }))
+      .map((d, i) => ({ i, x: xValues[i], y: d }))
       .sort((a, b) => b.y - a.y)
       .reduce(
         (result: GraphData, d, i) => {
+          const xPercentage = (d.y * 100) / yValuesSum;
+          const percentage = (result?.p[i - 1] ? result.p[i - 1] : 0) + xPercentage;
+          const xLabel = i === yValues.length - 1 ? `${percentage.toFixed(0)} %` : `${percentage.toFixed(2)} %`;
+          const tooltipLabel = `${xPercentage.toFixed(2)} %`;
+
           return {
             ...result,
-            x: [...result.x, d.x],
+            x: [...result.x, xLabel],
             y: [...result.y, d.y],
-            p: [...result.p, (result?.p[i - 1] ? result.p[i - 1] : 0) + (d.y * 100) / yValuesSum],
+            p: [...result.p, percentage],
+            yLabel: [...result.yLabel, d.y.toFixed(2)],
+            tooltipLabel: [...result.tooltipLabel, tooltipLabel],
           };
         },
-        { x: [], y: [], p: [] }
+        { x: [], y: [], p: [], yLabel: [], tooltipLabel: [] }
       );
     return this.results;
   }
