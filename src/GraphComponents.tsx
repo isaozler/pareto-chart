@@ -75,6 +75,8 @@ export const AxisComponent = ({
   pLabels,
   vitalBreakpointVal,
 }: AxisComponentInterface) => {
+  const hasVitals = !!data.p.filter((d: number) => d < vitalBreakpointVal).length;
+  const isVital = (_: any, i: number) => data.p[i] < vitalBreakpointVal || (!hasVitals && i === 0);
   return (
     <g className="axis">
       {showBottomAxis && (
@@ -82,9 +84,7 @@ export const AxisComponent = ({
           className="axis-bottom"
           transform={`translate(${padding}, ${chartHeight})`}
           ref={node => {
-            const [highestVitalFewValue] = data.p
-              .filter((d: any, i: number) => data.p[i] < vitalBreakpointVal)
-              .sort((a: number, b: number) => b - a);
+            const [highestVitalFewValue] = data.p.filter(isVital).sort((a: number, b: number) => b - a);
             const tickFilter = (d: any, i: number) => data.p[i] === highestVitalFewValue || data.p.length - 1 === i;
             const callHandler = d3AxisBottom(x).tickValues(x.domain().filter(tickFilter));
             d3Select(node)

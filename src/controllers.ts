@@ -77,8 +77,10 @@ export class PanelDataController {
       .sort((a, b) => b.y - a.y)
       .reduce(
         (result: GraphData, d, i) => {
-          const xPercentage = (d.y * 100) / yValuesSum;
-          const percentage = (result?.p[i - 1] ? result.p[i - 1] : 0) + xPercentage;
+          let xPercentage = (d.y * 100) / yValuesSum;
+          xPercentage = xPercentage > 100 ? 100 : xPercentage;
+          let percentage = (result?.p[i - 1] ? result.p[i - 1] : 0) + xPercentage;
+          percentage = percentage > 100 ? 100 : percentage;
           const xAxisLabels =
             i === yValues.length - 1 ? `${Math.trunc(Math.ceil(percentage))} %` : `${percentage.toFixed(2)} %`;
           const tooltipLabel = `${xPercentage.toFixed(2)} %`;
@@ -88,11 +90,12 @@ export class PanelDataController {
             x: [...result.x, d.x],
             y: [...result.y, d.y],
             p: [...result.p, percentage],
+            xP: [...result.xP, xPercentage],
             xAxisLabels: [...result.xAxisLabels, xAxisLabels],
             tooltipLabel: [...result.tooltipLabel, tooltipLabel],
           };
         },
-        { x: [], y: [], p: [], xAxisLabels: [], tooltipLabel: [] }
+        { x: [], y: [], p: [], xP: [], xAxisLabels: [], tooltipLabel: [] }
       );
     return this.results;
   }

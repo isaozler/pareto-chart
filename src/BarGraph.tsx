@@ -98,9 +98,10 @@ export function BarGraph(
     labelElement.innerHTML = contents.dataCopied;
     textField.remove();
   };
+  const yDomainMin = minYOffsetVal - barHeightOffset > 0 ? minYOffsetVal - barHeightOffset : 0;
 
   x.domain(data.xAxisLabels);
-  y.domain([minYOffsetVal - barHeightOffset, maxYOffsetVal + barHeightOffset]);
+  y.domain([yDomainMin, maxYOffsetVal + barHeightOffset]);
 
   return {
     padding,
@@ -141,11 +142,14 @@ const Component: React.FC<any> = ({
     issetVitalFewLine = state;
     return true;
   };
+  const hasVitals = !!data.p.filter((d: number, i: number) => d < vitalBreakpointVal).length;
+
   return (
     <g className="bars" transform={`translate(${padding}, 0)`}>
       {data.y.map((value: number, i: number) => {
         const currentX: number = x(data.xAxisLabels[i]) || 0;
         const step = Math.trunc(chartWidth / 10 / x.bandwidth());
+        const label = typeof data.y[i] === 'number' && valToFixed >= 0 ? data.y[i].toFixed(valToFixed) : data.y[i];
         const BarLabel = () => (
           <text
             transform={`translate(0, -${padding / 2})`}
@@ -153,9 +157,10 @@ const Component: React.FC<any> = ({
             x={currentX + x.bandwidth() / 2}
             y={y(value)}
           >
-            {valToFixed >= 0 ? data.y[i].toFixed(valToFixed) : data.y[i]}
+            {label}
           </text>
         );
+        const isVital = data.p[i] < vitalBreakpointVal || (!hasVitals && i === 0);
 
         return (
           <>
@@ -165,11 +170,11 @@ const Component: React.FC<any> = ({
               y={y(value)}
               width={x.bandwidth()}
               height={chartHeight - y(value)}
-              fill={data.p[i] > vitalBreakpointVal ? theme.palette.redBase : theme.palette.greenBase}
+              fill={isVital ? theme.palette.greenBase : theme.palette.redBase}
               data-label-header={data.x[i]}
               data-label={data.tooltipLabel[i]}
               data-count={data.y[i]}
-              data-is-vital={data.p[i] < vitalBreakpointVal}
+              data-is-vital={isVital}
               onMouseUp={barClickHandler}
               onMouseOver={tooltipHandler}
               onMouseMove={tooltipHandler}
