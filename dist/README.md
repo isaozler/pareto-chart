@@ -1,20 +1,28 @@
 # Grafana Pareto Panel Plugin
 
+[Screenshot of plugin](https://raw.githubusercontent.com/isaozler/pareto-chart/releases/latest/src/img/pareto-chart-screenshot.png)
+
 ## Getting started
 
-## DataSource
+This plugin provides you the ability to draw a Pareto chart with `RDB` and `TimeSeries databases`.
+
+### MySQL Sample
+
+Provide the `defects` which could be "categories" (type **string**) for example and a `frequency` value cummulatives/counts (type **number**).
+
+|  Defects | Counts |
+| :-:	| :-:	|
+| Error 1 | 10 |
+| Error 2 | 4 |
+| Error 3 | 1 |
+| ... | ... |
+
+## Sample Query
 
 ```sql
-# MySQL 
-
-## You need to return x (string[]) and y (number[]) columns.
-
-SELECT label as x, val as y
-FROM demo
+SELECT _label_, _count_, ...
+FROM _table_
 ```
-
-**Timeseries** datasources should work out of the box (just tested it with the core "**random walk**" test data from the "**--Grafana--**" data-source )
-
 ---
 
 ## IDE / Development

@@ -1,4 +1,5 @@
-interface GraphData {
+import { FieldType } from '@grafana/data';
+export interface GraphData {
   x: string[];
   y: number[];
   p: number[];
@@ -32,23 +33,23 @@ export class PanelDataController {
   }
 
   private setTableData(fields: any) {
-    const xData = fields.find(({ name }: { name: string }) => name === 'x');
-    const yData = fields.find(({ name }: { name: string }) => name === 'y');
-    const xValues: string[] = xData.values.toArray().map((d: any, i: number) => `${d}`);
+    const xData = fields.find(({ type }: { type: string }) => type === FieldType.string);
+    const yData = fields.find(({ type }: { type: string }) => type === FieldType.number);
+    const xValues: string[] = xData.values.toArray().map((d: any) => `${d}`);
     const yValues: number[] = yData.values.toArray();
     return this.setResults(xValues, yValues, this.sumYVals(yValues));
   }
 
   private setSeriesData(fields: any) {
     const [xData, yData] = fields;
-    const xValues: string[] = xData.values.toArray().map((d: any, i: number) => `T${i + 1}`);
+    const xValues: string[] = xData.values.toArray().map((d: any) => d);
     const yValues: number[] = yData.values.toArray();
     return this.setResults(xValues, yValues, this.sumYVals(yValues));
   }
 
   private setTimeSeriesData(series: any) {
-    const xValues: string[] = series.map(({ name }: { name: string }, i: number) => this.stripName(name));
-    const yValues: number[] = series.map(({ fields }: { fields: any }, i: number) => {
+    const xValues: string[] = series.map(({ name }: { name: string }) => this.stripName(name));
+    const yValues: number[] = series.map(({ fields }: { fields: any }) => {
       const [, val]: [any, any] = fields;
       const [response]: [number] = val.values.toArray();
       return response;
@@ -72,18 +73,26 @@ export class PanelDataController {
 
   private setResults(xValues: string[], yValues: number[], yValuesSum: number) {
     this.results = yValues
-      .map((d, i) => ({ x: xValues[i], y: d }))
+      .map((d, i) => ({ i, x: xValues[i], y: d }))
       .sort((a, b) => b.y - a.y)
       .reduce(
         (result: GraphData, d, i) => {
+          const xPercentage = (d.y * 100) / yValuesSum;
+          const percentage = (result?.p[i - 1] ? result.p[i - 1] : 0) + xPercentage;
+          const xAxisLabels =
+            i === yValues.length - 1 ? `${Math.trunc(Math.ceil(percentage))} %` : `${percentage.toFixed(2)} %`;
+          const tooltipLabel = `${xPercentage.toFixed(2)} %`;
+
           return {
             ...result,
             x: [...result.x, d.x],
             y: [...result.y, d.y],
-            p: [...result.p, (result?.p[i - 1] ? result.p[i - 1] : 0) + (d.y * 100) / yValuesSum],
+            p: [...result.p, percentage],
+            xAxisLabels: [...result.xAxisLabels, xAxisLabels],
+            tooltipLabel: [...result.tooltipLabel, tooltipLabel],
           };
         },
-        { x: [], y: [], p: [] }
+        { x: [], y: [], p: [], xAxisLabels: [], tooltipLabel: [] }
       );
     return this.results;
   }

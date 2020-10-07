@@ -9,15 +9,15 @@
       "url": "https://isaozler.com",
       "email": "contactme@isaozler.com"
     },
-    "keywords": [
-      "grafana", "pareto", "chart"
-    ],
+    "keywords": ["grafana", "pareto", "chart"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"
     },
     "links": [],
-    "screenshots": [],
+    "screenshots": [
+      { "name": "Pareto Chart Example", "path": "img/pareto-chart-screenshot.png" }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
