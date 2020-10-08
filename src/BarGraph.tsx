@@ -8,6 +8,7 @@ import {
   line as d3Line,
 } from 'd3';
 import { GraphData } from './controllers';
+import { getTextLabelClass } from './utils';
 
 export interface BarGraphSettings {
   options: any;
@@ -37,14 +38,16 @@ export function BarGraph(
   const padding = 20;
   const chartHeight = height - 2 * padding;
   const chartWidth = width - 2 * padding;
-  const x = d3ScaleBand()
+  const xBand = d3ScaleBand()
     .range([0, chartWidth - padding])
     .padding(options.barPadding);
+  const xLinear = d3ScaleLinear().range([0, chartWidth]);
+  const x = d3ScaleLinear().range([0, chartWidth]);
   const y = d3ScaleLinear().range([chartHeight, 0]);
   const p = d3ScaleLinear().range([chartHeight, 0]);
   const line = d3Line()
-    .x((d, i) => x(data.xAxisLabels[i]) || 0)
-    .y((d: any, i) => chartHeight - (d.p * chartHeight) / 100 - padding);
+    .x((d, i) => x(i) || 0)
+    .y((d: any) => p(d.p / 100));
   const pLabels = (n: any, index: number): string => {
     if (index === 0 || !n || !!!n) {
       return ``;
@@ -57,7 +60,6 @@ export function BarGraph(
   const barHeightOffset = data.p[0] / data.p.length;
   const getCopyLabel = (text: string) =>
     `<span class="tooltip-copy-label ${!isCopyLabelVisible ? 'hidden' : ''}">${text}</span>`;
-
   const tooltipHandler = (event: React.MouseEvent<SVGRectElement, MouseEvent>) => {
     const { current: tooltipDiv } = tooltipRef || { current: null };
     const { current: tooltipContentDiv } = tooltipContentRef || { current: null };
@@ -88,24 +90,33 @@ export function BarGraph(
     const textField = document.createElement('textarea');
     textField.innerText = content;
     const appendTo = !!tooltipRef.current ? tooltipRef.current : document.body;
+
     if (!!appendTo) {
       appendTo.appendChild(textField);
     }
+
     textField.select();
     document.execCommand('copy');
+
     const tooltipCopyLabelEl: HTMLCollectionOf<Element> = document.getElementsByClassName('tooltip-copy-label');
     const labelElement: Element = tooltipCopyLabelEl[0];
     labelElement.innerHTML = contents.dataCopied;
+
     textField.remove();
   };
   const yDomainMin = minYOffsetVal - barHeightOffset > 0 ? minYOffsetVal - barHeightOffset : 0;
 
-  x.domain(data.xAxisLabels);
+  xBand.domain(data.xAxisLabels);
+  xLinear.domain([-1, data.x.length]);
+  x.domain([-1, data.x.length]);
+  p.domain([0, 1]);
   y.domain([yDomainMin, maxYOffsetVal + barHeightOffset]);
 
   return {
     padding,
     x,
+    xBand,
+    xLinear,
     y,
     p,
     chartHeight,
@@ -127,6 +138,7 @@ const Component: React.FC<any> = ({
   theme,
   padding,
   x,
+  xBand,
   y,
   chartHeight,
   chartWidth,
@@ -134,7 +146,6 @@ const Component: React.FC<any> = ({
   barClickHandler,
   vitalBreakpointVal,
   showVitalFew,
-  showBarValue,
   valToFixed,
 }) => {
   let issetVitalFewLine = false;
@@ -145,57 +156,55 @@ const Component: React.FC<any> = ({
   const hasVitals = !!data.p.filter((d: number, i: number) => d < vitalBreakpointVal).length;
 
   return (
-    <g className="bars" transform={`translate(${padding}, 0)`}>
-      {data.y.map((value: number, i: number) => {
-        const currentX: number = x(data.xAxisLabels[i]) || 0;
-        const step = Math.trunc(chartWidth / 10 / x.bandwidth());
-        const label = typeof data.y[i] === 'number' && valToFixed >= 0 ? data.y[i].toFixed(valToFixed) : data.y[i];
-        const BarLabel = () => (
+    <g clipPath="url(#chartMask)" className="bars" transform={`translate(${padding}, 0)`}>
+      {data.y.map((val: number, i: number) => {
+        const currentX: number = x(i) - (xBand.bandwidth() * 0.9) / 2;
+        const step = Math.trunc(chartWidth / 10 / xBand.bandwidth());
+        const label = typeof val === 'number' && valToFixed >= 0 ? val.toFixed(valToFixed) : val;
+        const BarLabel = ({ index, className }: any) => (
           <text
+            data-index={index}
             transform={`translate(0, -${padding / 2})`}
-            className={styles.barValue}
-            x={currentX + x.bandwidth() / 2}
-            y={y(value)}
+            className={[className, styles.barValue].join(' ')}
+            x={currentX + xBand.bandwidth() / 2}
+            y={y(val)}
           >
             {label}
           </text>
         );
         const isVital = data.p[i] < vitalBreakpointVal || (!hasVitals && i === 0);
-
+        const textLabelClass = getTextLabelClass(xBand.bandwidth(), styles, i, step);
         return (
           <>
             <rect
               className={styles.bar}
-              x={currentX}
-              y={y(value)}
-              width={x.bandwidth()}
-              height={chartHeight - y(value)}
               fill={isVital ? theme.palette.greenBase : theme.palette.redBase}
               data-label-header={data.x[i]}
               data-label={data.tooltipLabel[i]}
-              data-count={data.y[i]}
+              data-count={val}
               data-is-vital={isVital}
               onMouseUp={barClickHandler}
               onMouseOver={tooltipHandler}
               onMouseMove={tooltipHandler}
               onMouseOut={tooltipHandler}
+              ref={node => {
+                d3Select(node)
+                  .attr('x', currentX)
+                  .attr('y', y(val))
+                  .attr('width', xBand.bandwidth())
+                  .attr('height', chartHeight - y(val));
+              }}
             />
-            {showBarValue && x.bandwidth() >= 30 ? (
-              <BarLabel />
-            ) : showBarValue && x.bandwidth() < 30 && i % step === 0 ? (
-              <BarLabel />
-            ) : (
-              <></>
-            )}
+            <BarLabel index={i} className={['bar-values', textLabelClass].join(' ')} />
             <>
-              {data.p[i] > vitalBreakpointVal && showVitalFew && !issetVitalFewLine && setIssetVitalFewLine(true) && (
+              {!isVital && showVitalFew && !issetVitalFewLine && setIssetVitalFewLine(true) && (
                 <line
-                  className={styles.lineCutOff}
+                  className={['line--vertical', styles.lineCutOff].join(' ')}
                   transform={`translate(${0}, 0)`}
                   ref={node => {
                     d3Select(node)
-                      .attr('x1', currentX + x.bandwidth() / 2)
-                      .attr('x2', currentX + x.bandwidth() / 2)
+                      .attr('x1', currentX + xBand.bandwidth() / 2)
+                      .attr('x2', currentX + xBand.bandwidth() / 2)
                       .attr('y1', 0)
                       .attr('y2', chartHeight);
                   }}

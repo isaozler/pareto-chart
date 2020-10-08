@@ -4,7 +4,13 @@ import { select as d3Select, axisBottom as d3AxisBottom, axisLeft as d3AxisLeft 
 interface PathsComponentInterface {
   styles: any;
   padding: number;
+  chartWidth: number;
+  chartHeight: number;
+  vitalBreakpointVal: number;
   x: any;
+  p: any;
+  y: any;
+  xBand: any;
   pathData: any;
   line: any;
   showVitalFew: boolean;
@@ -30,17 +36,19 @@ interface AxisComponentInterface {
 export const PathsComponent = ({
   styles,
   padding,
-  x,
+  chartWidth,
+  vitalBreakpointVal,
+  p,
+  xBand,
   pathData,
   line,
   showVitalFew,
-  cutOffXPathData,
 }: PathsComponentInterface) => {
   return (
-    <g className={styles.paths}>
+    <g clipPath="url(#chartMask)" className={styles.paths}>
       <path
-        className={styles.line}
-        transform={`translate(${padding + x.bandwidth() / 2}, ${padding})`}
+        className={['line--curve', styles.line].join(' ')}
+        transform={`translate(${padding}, 0)`}
         ref={node => {
           d3Select(node)
             .datum(pathData)
@@ -48,13 +56,15 @@ export const PathsComponent = ({
         }}
       />
       {showVitalFew && (
-        <path
-          className={styles.lineCutOff}
-          transform={`translate(${padding + x.bandwidth() / 2}, ${padding})`}
+        <line
+          className={['line--horizontal', styles.lineCutOff].join(' ')}
+          transform={`translate(${padding + xBand.bandwidth() / 2}, 0)`}
           ref={node => {
             d3Select(node)
-              .datum(cutOffXPathData)
-              .attr('d', line);
+              .attr('x1', 0)
+              .attr('x2', chartWidth - padding)
+              .attr('y1', p(vitalBreakpointVal / 100))
+              .attr('y2', p(vitalBreakpointVal / 100));
           }}
         />
       )}
@@ -77,8 +87,9 @@ export const AxisComponent = ({
 }: AxisComponentInterface) => {
   const hasVitals = !!data.p.filter((d: number) => d < vitalBreakpointVal).length;
   const isVital = (_: any, i: number) => data.p[i] < vitalBreakpointVal || (!hasVitals && i === 0);
+
   return (
-    <g className="axis">
+    <g className={['axis', styles.axis].join(' ')}>
       {showBottomAxis && (
         <g
           className="axis-bottom"
@@ -87,6 +98,7 @@ export const AxisComponent = ({
             const [highestVitalFewValue] = data.p.filter(isVital).sort((a: number, b: number) => b - a);
             const tickFilter = (d: any, i: number) => data.p[i] === highestVitalFewValue || data.p.length - 1 === i;
             const callHandler = d3AxisBottom(x).tickValues(x.domain().filter(tickFilter));
+
             d3Select(node)
               .call(callHandler as any)
               .selectAll('text')

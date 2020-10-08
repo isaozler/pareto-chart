@@ -91,6 +91,9 @@ export const getStyles = stylesFactory(() => {
     barValue: css`
       fill: ${theme.colors.text};
       text-anchor: middle;
+      opacity: 1;
+      transition: opacity 0.2s ease-out;
+      user-select: none;
     `,
     line: css`
       fill: none;
@@ -110,6 +113,42 @@ export const getStyles = stylesFactory(() => {
     `,
     paths: css`
       position: relative;
+    `,
+    brushWrapper: css`
+      fill: ${theme.colors.bg3};
+      stroke: ${theme.colors.border2};
+      stroke-width: 0.75px;
+
+      .selection {
+        fill: ${theme.colors.bgBlue2} !important;
+        fill-opacity: 0.75;
+        stroke: none;
+
+        &--invalid {
+          fill: ${theme.palette.brandDanger} !important;
+        }
+      }
+
+      .handle {
+        fill: ${theme.palette.brandWarning} !important;
+        fill-opacity: 0.75;
+      }
+    `,
+    brushOverlay: css`
+      cursor: crosshair;
+    `,
+    textLabel: {
+      __largeBar: css``,
+      __smallBar: css``,
+      __hidden: css`
+        fill: none;
+        opacity: 0;
+      `,
+    },
+    axis: css`
+      text {
+        user-select: none;
+      }
     `,
   };
 });
