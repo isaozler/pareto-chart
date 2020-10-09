@@ -1,4 +1,4 @@
-import React, { MutableRefObject as ReactMutableRefObject } from 'react';
+import React from 'react';
 import {
   select as d3Select,
   max as d3Max,
@@ -9,7 +9,9 @@ import {
   curveBasis as d3LineCurve,
 } from 'd3';
 import { GraphData } from './controllers';
-import { getTextLabelClass } from './utils';
+import { getTextLabelClass, debounce } from './utils';
+import { eventBus } from './eventBus';
+import { CONSTANTS } from './constants';
 
 export interface BarGraphSettings {
   options: any;
@@ -17,23 +19,8 @@ export interface BarGraphSettings {
   height: number;
 }
 
-interface BarGraphRefs {
-  theme: any;
-  tooltipRef: ReactMutableRefObject<null>;
-  tooltipContentRef: ReactMutableRefObject<null>;
-}
-
-export function BarGraph(
-  data: GraphData,
-  { options, width, height }: BarGraphSettings,
-  { theme, tooltipRef, tooltipContentRef }: BarGraphRefs
-) {
-  const { vitalBreakpointVal, isCopyLabelVisible } = options;
-  const contents = {
-    initCopyText: 'Click on bar to copy data',
-    copyText: '',
-    dataCopied: 'Copied data!',
-  };
+export function BarGraph(data: GraphData, { options, width, height }: BarGraphSettings) {
+  const { vitalBreakpointVal } = options;
   const maxYOffsetVal: number = d3Max(data.y) || 0;
   const minYOffsetVal: number = d3Min(data.y) || 0;
   const padding = 20;
@@ -64,52 +51,6 @@ export function BarGraph(
   const cutOffXPathData = data.p.map((d, i) => ({ x: data.xAxisLabels[i] || '', p: vitalBreakpointVal })) || null;
   const bottomLineData = data.p.map((d, i) => ({ x: i, p: 0 }));
   const barHeightOffset = data.p[0] / data.p.length;
-  const getCopyLabel = (text: string) =>
-    `<span class="tooltip-copy-label ${!isCopyLabelVisible ? 'hidden' : ''}">${text}</span>`;
-  const tooltipHandler = (event: React.MouseEvent<SVGRectElement, MouseEvent>) => {
-    const { current: tooltipDiv } = tooltipRef || { current: null };
-    const { current: tooltipContentDiv } = tooltipContentRef || { current: null };
-    const { labelHeader, label: labelValue, isVital, count } = event.currentTarget?.dataset || {};
-    const isVisible = ['mouseover', 'mousemove'].includes(event.type) ? true : false;
-
-    if (event.type === 'mouseout') {
-      contents.copyText = contents.initCopyText;
-    }
-
-    if (!!tooltipDiv) {
-      d3Select(tooltipDiv)
-        .style('opacity', isVisible ? 0.9 : 0)
-        .style('left', isVisible ? `${event.pageX}px` : '1000vw')
-        .style('top', isVisible ? `${event.pageY - 28}px` : '-1000vh');
-      d3Select(tooltipContentDiv).style(
-        'background',
-        isVital === 'true' ? theme.palette.greenBase : theme.palette.redBase
-      ).html(`<label class="label-header">${labelHeader}
-        ${!!contents.copyText ? getCopyLabel(contents.copyText) : ''}</label>
-        <label class="label-value">Percentage of sum: ${labelValue}</label>
-        <strong>${count}</strong>
-      `);
-    }
-  };
-  const barClickHandler = (event: React.MouseEvent<SVGRectElement, MouseEvent>) => {
-    const content = event.currentTarget?.dataset.labelHeader || 'No Content';
-    const textField = document.createElement('textarea');
-    textField.innerText = content;
-    const appendTo = !!tooltipRef.current ? tooltipRef.current : document.body;
-
-    if (!!appendTo) {
-      appendTo.appendChild(textField);
-    }
-
-    textField.select();
-    document.execCommand('copy');
-
-    const tooltipCopyLabelEl: HTMLCollectionOf<Element> = document.getElementsByClassName('tooltip-copy-label');
-    const labelElement: Element = tooltipCopyLabelEl[0];
-    labelElement.innerHTML = contents.dataCopied;
-
-    textField.remove();
-  };
   const yDomainMin = minYOffsetVal - barHeightOffset > 0 ? minYOffsetVal - barHeightOffset : 0;
 
   xBand.domain(data.xAxisLabels);
@@ -129,8 +70,6 @@ export function BarGraph(
     p,
     chartHeight,
     chartWidth,
-    tooltipHandler,
-    barClickHandler,
     line,
     pathData,
     cutOffXPathData,
@@ -150,8 +89,6 @@ const Component: React.FC<any> = ({
   y,
   chartHeight,
   chartWidth,
-  tooltipHandler,
-  barClickHandler,
   vitalBreakpointVal,
   showVitalFew,
   showBarValue,
@@ -165,6 +102,10 @@ const Component: React.FC<any> = ({
   };
   const hasVitals = !!data.p.filter((d: number, i: number) => d < vitalBreakpointVal).length;
   const bandwidth = xBand.bandwidth() * 0.9;
+  const barClickHandler = (event: any) => eventBus.dispatch(CONSTANTS.E_TOOLTIP_CLICK, event);
+  const barMoveHandler = (event: any) => eventBus.dispatch(CONSTANTS.E_TOOLTIP_MOVE, event);
+  const debouncedClickHandler = debounce(barClickHandler, 200);
+  const debouncedMoveHandler = debounce(barMoveHandler, 200);
 
   return (
     <g clipPath={`url(#${chartId})`} className="bars" transform={`translate(${padding}, 0)`}>
@@ -196,10 +137,16 @@ const Component: React.FC<any> = ({
               data-label={data.tooltipLabel[i]}
               data-count={val}
               data-is-vital={isVital}
-              onMouseUp={barClickHandler}
-              onMouseOver={tooltipHandler}
-              onMouseMove={tooltipHandler}
-              onMouseOut={tooltipHandler}
+              onMouseUp={({ currentTarget }) => debouncedClickHandler({ currentTarget })}
+              onMouseOver={({ currentTarget, type, pageX, pageY }) =>
+                debouncedMoveHandler({ currentTarget, type, pageX, pageY })
+              }
+              onMouseMove={({ currentTarget, type, pageX, pageY }) =>
+                debouncedMoveHandler({ currentTarget, type, pageX, pageY })
+              }
+              onMouseOut={({ currentTarget, type, pageX, pageY }) =>
+                debouncedMoveHandler({ currentTarget, type, pageX, pageY })
+              }
               ref={node => {
                 d3Select(node)
                   .attr('x', currentX)

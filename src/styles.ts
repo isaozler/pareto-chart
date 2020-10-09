@@ -18,8 +18,17 @@ export const getStyles = stylesFactory(() => {
       z-index: 100;
       min-width: 20vw;
       display: flex;
-      top: -1000vh;
-      left: -1000vw;
+      transition: all 0.2s ease;
+
+      &:not(.tooltip--visible) {
+        z-index: -10;
+        opacity: 0;
+      }
+
+      .tooltip--visible {
+        z-index: 1;
+        opacity: 1;
+      }
     `,
     tooltip: css`
       position: absolute;
