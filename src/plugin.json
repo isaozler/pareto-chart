@@ -17,7 +17,7 @@
     "links": [],
     "screenshots": [
       { "name": "Pareto Chart Dashboard Impression", "path": "img/production-env--impression.jpg" },
-      { "name": "Pareto Chart Edit Dashboard", "path": "img/pareto-chart-edit-panel-screenshot.jpg" }
+      { "name": "Pareto Chart Edit Dashboard", "path": "img/pareto-chart-edit-panel.jpg" }
     ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
