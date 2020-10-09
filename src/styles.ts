@@ -18,8 +18,8 @@ export const getStyles = stylesFactory(() => {
       z-index: 100;
       min-width: 20vw;
       display: flex;
-      top: -100vh;
-      left: -100vw;
+      top: -1000vh;
+      left: -1000vw;
     `,
     tooltip: css`
       position: absolute;
@@ -91,11 +91,15 @@ export const getStyles = stylesFactory(() => {
     barValue: css`
       fill: ${theme.colors.text};
       text-anchor: middle;
+      opacity: 1;
+      transition: opacity 0.2s ease-out;
+      user-select: none;
     `,
     line: css`
       fill: none;
-      stroke: ${theme.isDark ? 'rgba(255,255,255,.5)' : 'rgba(0,0,0,.5)'};
+      stroke: ${theme.colors.text};
       stroke-width: 2px;
+      shape-rendering: geometricPrecision;
     `,
     lineCutOff: css`
       fill: none;
@@ -104,12 +108,70 @@ export const getStyles = stylesFactory(() => {
       stroke-dasharray: 5px;
     `,
     lineBottomAxis: css`
-      fill: none;
-      stroke: rgba(255, 255, 255, 1);
-      stroke-width: 0.75px;
+      // fill: none;
+      stroke: ${theme.colors.text};
+      shape-rendering: crispEdges;
     `,
     paths: css`
       position: relative;
     `,
+    brushWrapper: css`
+      fill: ${theme.colors.bg3};
+      stroke: ${theme.colors.border2};
+      stroke-width: 0.75px;
+
+      .selection {
+        fill: ${theme.colors.bgBlue2} !important;
+        fill-opacity: 0.75;
+        stroke: none;
+
+        &--invalid {
+          fill: ${theme.palette.brandDanger} !important;
+        }
+      }
+
+      .handle {
+        fill: ${theme.palette.brandWarning} !important;
+        fill-opacity: 0.75;
+      }
+    `,
+    brushOverlay: css`
+      cursor: crosshair;
+    `,
+    textLabel: {
+      __largeBar: css``,
+      __smallBar: css``,
+      __hidden: css`
+        fill: none;
+        opacity: 0;
+      `,
+    },
+    axis: css`
+      text {
+        user-select: none;
+      }
+    `,
+    chartMaskId: css`
+      fill: none;
+      user-select: none;
+    `,
+    placeholder: {
+      __noData: css`
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: ${theme.palette.redBase};
+        height: 100%;
+        user-select: none;
+      `,
+    },
+    forcedHidden: {
+      __barLabel: css`
+        opacity: 0 !important;
+        transform: translate(0, -100px);
+      `,
+    },
   };
 });

@@ -1,12 +1,22 @@
 # Grafana Pareto Panel Plugin
 
-[Screenshot of plugin](https://raw.githubusercontent.com/isaozler/pareto-chart/releases/latest/src/img/pareto-chart-screenshot.png)
-
-## Getting started
+![Edit Panel](https://raw.githubusercontent.com/isaozler/pareto-chart/releases/latest/src/img/pareto-chart-edit-panel.jpg)
 
 This plugin provides you the ability to draw a Pareto chart with `RDB` and `TimeSeries databases`.
 
-### MySQL Sample
+## Features
+- Configurable vital view and trivial many lines
+- Pan and zoom for detailed info without changing date range
+- Set decimals count on displayed values
+- Specify bar spacing
+- Quickly copy bar value to clipboard simply by clicking on the bar
+- Option to show/hide bar values on default
+
+# TimeSeries (InfluxDB) dashboard impression
+
+![Dashboard impression](https://raw.githubusercontent.com/isaozler/pareto-chart/releases/latest/src/img/production-env--impression.jpg)
+
+## MySQL Example
 
 Provide the `defects` which could be "categories" (type **string**) for example and a `frequency` value cummulatives/counts (type **number**).
 
@@ -17,7 +27,7 @@ Provide the `defects` which could be "categories" (type **string**) for example 
 | Error 3 | 1 |
 | ... | ... |
 
-## Sample Query
+## Example Query
 
 ```sql
 SELECT _label_, _count_, ...
