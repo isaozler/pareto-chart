@@ -6,6 +6,7 @@ import {
   scaleLinear as d3ScaleLinear,
   scaleBand as d3ScaleBand,
   line as d3Line,
+  curveBasis as d3LineCurve,
 } from 'd3';
 import { GraphData } from './controllers';
 import { getTextLabelClass } from './utils';
@@ -36,16 +37,21 @@ export function BarGraph(
   const maxYOffsetVal: number = d3Max(data.y) || 0;
   const minYOffsetVal: number = d3Min(data.y) || 0;
   const padding = 20;
-  const chartHeight = height - 2 * padding;
+  const chartHeight = height - 3 * padding;
   const chartWidth = width - 2 * padding;
   const xBand = d3ScaleBand()
     .range([0, chartWidth - padding])
     .padding(options.barPadding);
-  const xLinear = d3ScaleLinear().range([0, chartWidth]);
-  const x = d3ScaleLinear().range([0, chartWidth]);
+  const xPBand = d3ScaleBand()
+    .range([0, chartWidth - padding])
+    .padding(options.barPadding)
+    .paddingOuter(0.6);
+  const xLinear = d3ScaleLinear().range([0, chartWidth - padding]);
+  const x = d3ScaleLinear().range([0, chartWidth - padding]);
   const y = d3ScaleLinear().range([chartHeight, 0]);
   const p = d3ScaleLinear().range([chartHeight, 0]);
   const line = d3Line()
+    .curve(d3LineCurve)
     .x((d, i) => x(i) || 0)
     .y((d: any) => p(d.p / 100));
   const pLabels = (n: any, index: number): string => {
@@ -73,8 +79,8 @@ export function BarGraph(
     if (!!tooltipDiv) {
       d3Select(tooltipDiv)
         .style('opacity', isVisible ? 0.9 : 0)
-        .style('left', `${event.pageX}px`)
-        .style('top', `${event.pageY - 28}px`);
+        .style('left', isVisible ? `${event.pageX}px` : '1000vw')
+        .style('top', isVisible ? `${event.pageY - 28}px` : '-1000vh');
       d3Select(tooltipContentDiv).style(
         'background',
         isVital === 'true' ? theme.palette.greenBase : theme.palette.redBase
@@ -107,6 +113,7 @@ export function BarGraph(
   const yDomainMin = minYOffsetVal - barHeightOffset > 0 ? minYOffsetVal - barHeightOffset : 0;
 
   xBand.domain(data.xAxisLabels);
+  xPBand.domain(data.xAxisLabels);
   xLinear.domain([-1, data.x.length]);
   x.domain([-1, data.x.length]);
   p.domain([0, 1]);
@@ -116,6 +123,7 @@ export function BarGraph(
     padding,
     x,
     xBand,
+    xPBand,
     xLinear,
     y,
     p,
@@ -146,7 +154,9 @@ const Component: React.FC<any> = ({
   barClickHandler,
   vitalBreakpointVal,
   showVitalFew,
+  showBarValue,
   valToFixed,
+  chartId,
 }) => {
   let issetVitalFewLine = false;
   const setIssetVitalFewLine = (state: boolean): boolean => {
@@ -154,26 +164,29 @@ const Component: React.FC<any> = ({
     return true;
   };
   const hasVitals = !!data.p.filter((d: number, i: number) => d < vitalBreakpointVal).length;
+  const bandwidth = xBand.bandwidth() * 0.9;
 
   return (
-    <g clipPath="url(#chartMask)" className="bars" transform={`translate(${padding}, 0)`}>
+    <g clipPath={`url(#${chartId})`} className="bars" transform={`translate(${padding}, 0)`}>
       {data.y.map((val: number, i: number) => {
-        const currentX: number = x(i) - (xBand.bandwidth() * 0.9) / 2;
-        const step = Math.trunc(chartWidth / 10 / xBand.bandwidth());
+        const currentX: number = x(i) - bandwidth / 2;
+        const step = Math.trunc(chartWidth / 10 / bandwidth);
         const label = typeof val === 'number' && valToFixed >= 0 ? val.toFixed(valToFixed) : val;
+        const isForcedHidden = !showBarValue;
+        const visibilityClassName = isForcedHidden ? styles.forcedHidden.__barLabel : '';
         const BarLabel = ({ index, className }: any) => (
           <text
             data-index={index}
             transform={`translate(0, -${padding / 2})`}
-            className={[className, styles.barValue].join(' ')}
-            x={currentX + xBand.bandwidth() / 2}
+            className={[className, styles.barValue, visibilityClassName].join(' ')}
+            x={currentX + bandwidth / 2}
             y={y(val)}
           >
             {label}
           </text>
         );
         const isVital = data.p[i] < vitalBreakpointVal || (!hasVitals && i === 0);
-        const textLabelClass = getTextLabelClass(xBand.bandwidth(), styles, i, step);
+        const textLabelClass = getTextLabelClass(bandwidth, styles, i, step);
         return (
           <>
             <rect
@@ -191,7 +204,7 @@ const Component: React.FC<any> = ({
                 d3Select(node)
                   .attr('x', currentX)
                   .attr('y', y(val))
-                  .attr('width', xBand.bandwidth())
+                  .attr('width', bandwidth)
                   .attr('height', chartHeight - y(val));
               }}
             />
@@ -203,8 +216,8 @@ const Component: React.FC<any> = ({
                   transform={`translate(${0}, 0)`}
                   ref={node => {
                     d3Select(node)
-                      .attr('x1', currentX + xBand.bandwidth() / 2)
-                      .attr('x2', currentX + xBand.bandwidth() / 2)
+                      .attr('x1', currentX + bandwidth / 2)
+                      .attr('x2', currentX + bandwidth / 2)
                       .attr('y1', 0)
                       .attr('y2', chartHeight);
                   }}

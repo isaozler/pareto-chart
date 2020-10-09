@@ -1,9 +1,11 @@
 import React from 'react';
 import { select as d3Select, axisBottom as d3AxisBottom, axisLeft as d3AxisLeft } from 'd3';
+import { tickFilter } from './utils';
 
 interface PathsComponentInterface {
   styles: any;
   padding: number;
+  chartId: string;
   chartWidth: number;
   chartHeight: number;
   vitalBreakpointVal: number;
@@ -19,7 +21,6 @@ interface PathsComponentInterface {
 
 interface AxisComponentInterface {
   data: any;
-  showBottomAxis: any;
   padding: number;
   styles: any;
   line: any;
@@ -31,11 +32,13 @@ interface AxisComponentInterface {
   y: any;
   p: any;
   pLabels: any;
+  xPBand: any;
 }
 
 export const PathsComponent = ({
   styles,
   padding,
+  chartId,
   chartWidth,
   vitalBreakpointVal,
   p,
@@ -45,7 +48,7 @@ export const PathsComponent = ({
   showVitalFew,
 }: PathsComponentInterface) => {
   return (
-    <g clipPath="url(#chartMask)" className={styles.paths}>
+    <g clipPath={`url(#${chartId})`} className={styles.paths}>
       <path
         className={['line--curve', styles.line].join(' ')}
         transform={`translate(${padding}, 0)`}
@@ -75,11 +78,11 @@ export const PathsComponent = ({
 export const AxisComponent = ({
   data,
   styles,
-  showBottomAxis,
   padding,
   chartHeight,
   chartWidth,
   x,
+  xPBand,
   y,
   p,
   pLabels,
@@ -90,37 +93,34 @@ export const AxisComponent = ({
 
   return (
     <g className={['axis', styles.axis].join(' ')}>
-      {showBottomAxis && (
-        <g
-          className="axis-bottom"
-          transform={`translate(${padding}, ${chartHeight})`}
-          ref={node => {
-            const [highestVitalFewValue] = data.p.filter(isVital).sort((a: number, b: number) => b - a);
-            const tickFilter = (d: any, i: number) => data.p[i] === highestVitalFewValue || data.p.length - 1 === i;
-            const callHandler = d3AxisBottom(x).tickValues(x.domain().filter(tickFilter));
+      <g
+        className="axis-bottom"
+        transform={`translate(${padding}, ${chartHeight + 15})`}
+        ref={node => {
+          const [highestVitalFewValue] = data.p.filter(isVital).sort((a: number, b: number) => b - a);
+          const i: number = data.p.findIndex((pV: number) => pV === highestVitalFewValue);
+          const filterHandler = tickFilter(data.xAxisLabels[i + 1], data.p.length - 1);
+          const xPAxis = d3AxisBottom(xPBand).tickValues(data.xAxisLabels.filter(filterHandler));
 
-            d3Select(node)
-              .call(callHandler as any)
-              .selectAll('text')
-              .attr('y', padding / 2)
-              .attr('x', 0)
-              .style('text-anchor', 'center');
-          }}
-        />
-      )}
-      {!showBottomAxis && (
-        <line
-          className={styles.lineBottomAxis}
-          transform={`translate(${padding}, 0)`}
-          ref={node => {
-            d3Select(node)
-              .attr('x1', 0)
-              .attr('x2', chartWidth - padding)
-              .attr('y1', chartHeight)
-              .attr('y2', chartHeight);
-          }}
-        />
-      )}
+          d3Select(node)
+            .call(xPAxis as any)
+            .selectAll('text')
+            .attr('y', padding / 2)
+            .attr('x', 0)
+            .style('text-anchor', 'center');
+        }}
+      />
+      <line
+        className={styles.lineBottomAxis}
+        transform={`translate(${padding}, ${1})`}
+        ref={node => {
+          d3Select(node)
+            .attr('x1', 0)
+            .attr('x2', chartWidth - padding)
+            .attr('y1', chartHeight)
+            .attr('y2', chartHeight);
+        }}
+      />
       <g
         className="axis-left"
         transform={`translate(${padding}, 0)`}

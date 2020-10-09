@@ -20,12 +20,15 @@ import { getTextLabelClass } from './utils';
 interface Props extends PanelProps<ParetoOptions> {}
 
 export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) => {
-  if (!data || !!!data.series.length) {
-    return <>No Data</>;
-  }
   const svgRef = useRef(null);
   const theme = useTheme();
   const styles = getStyles();
+
+  if (!data || !!!data.series.length) {
+    return <div className={['placeholder--no-data', styles.placeholder.__noData].join(' ')}>No Data</div>;
+  }
+
+  const chartId = `chartMask_${styles.chartMaskId}_${+new Date()}`;
   const tooltipRef = useRef(null);
   const tooltipContentRef = useRef(null);
   const PanelData = new PanelDataController(data);
@@ -36,6 +39,7 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
   const props = {
     data: graphData,
     styles,
+    chartId,
     ...options,
     ...barGraphRefs,
     ...barGraphData,
@@ -47,7 +51,9 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
   const minLimitSelection = 5;
   let idleTimeout: any = null;
   let idleDelay = 350;
-  const idled = () => (idleTimeout = null);
+  const idled = () => {
+    idleTimeout = null;
+  };
   const checkXBand = d3ScaleBand()
     .range([0, props.chartWidth - props.padding])
     .padding(options.barPadding);
@@ -77,6 +83,7 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
     }
   };
   const brushHandler = () => {
+    const svg = d3Select(svgRef.current);
     const { selection } = d3Event || {};
 
     if (!initXDomain || !initBandWidth) {
@@ -85,7 +92,6 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
     }
 
     if (!!selection) {
-      const svg = d3Select(svgRef.current);
       props.x.domain(selection.map(props.xLinear.invert, props.xLinear));
 
       const barCount = props.data.xAxisLabels.length;
@@ -102,29 +108,33 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
       lastSelection = selection;
       const initWidth = props.chartWidth - props.padding;
       const newEndRange = (100 / percentage) * initWidth;
+
       props.xBand
         .range([0, newEndRange])
         .padding(options.barPadding)
         .domain(props.data.xAxisLabels);
-      props.xBand = d3ScaleBand()
-        .range([0, newEndRange])
-        .padding(props.barPadding);
       props.xBand.domain(props.data.xAxisLabels);
     } else {
       if (!idleTimeout) {
         idleTimeout = setTimeout(idled, idleDelay);
+        svg.select('.brush').call(brush.move as any, lastSelection);
         return;
       }
 
+      const resetRange: [number, number] = [0, props.chartWidth - props.padding];
+      lastSelection = null;
       props.x.domain(initXDomain);
-      props.xBand.domain(props.data.xAxisLabels);
+      props.xBand
+        .range(resetRange)
+        .padding(options.barPadding)
+        .domain(props.data.xAxisLabels);
     }
     zoom();
   };
   const brush = d3BrushX()
     .extent([
       [0, 0],
-      [width - 2 * props.padding, 10],
+      [props.chartWidth - props.padding, 10],
     ])
     .on('brush', brushCalcHandler)
     .on('end', brushHandler);
@@ -234,7 +244,7 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
         `
       )}
     >
-      <div ref={tooltipRef} className={styles.tooltipContainer}>
+      <div ref={tooltipRef} className={['tooltip__container', styles.tooltipContainer].join(' ')}>
         <div ref={tooltipContentRef} className={styles.tooltip} />
       </div>
       <svg
@@ -252,14 +262,14 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
           <AxisComponent {...props} />
         </g>
         <g
-          transform={`translate(${2 * props.padding}, ${props.padding + props.chartHeight + 1})`}
+          transform={`translate(${2 * props.padding}, ${props.padding + props.chartHeight + 3})`}
           className={['brush', styles.brushWrapper].join(' ')}
           ref={node => {
             d3Select(node).call(brush as any);
           }}
         />
         <defs>
-          <clipPath id="chartMask">
+          <clipPath id={chartId}>
             <rect
               transform={`translate(0, -${props.padding})`}
               ref={node => {

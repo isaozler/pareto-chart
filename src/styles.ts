@@ -18,8 +18,8 @@ export const getStyles = stylesFactory(() => {
       z-index: 100;
       min-width: 20vw;
       display: flex;
-      top: -100vh;
-      left: -100vw;
+      top: -1000vh;
+      left: -1000vw;
     `,
     tooltip: css`
       position: absolute;
@@ -97,8 +97,9 @@ export const getStyles = stylesFactory(() => {
     `,
     line: css`
       fill: none;
-      stroke: ${theme.isDark ? 'rgba(255,255,255,.5)' : 'rgba(0,0,0,.5)'};
+      stroke: ${theme.colors.text};
       stroke-width: 2px;
+      shape-rendering: geometricPrecision;
     `,
     lineCutOff: css`
       fill: none;
@@ -107,9 +108,9 @@ export const getStyles = stylesFactory(() => {
       stroke-dasharray: 5px;
     `,
     lineBottomAxis: css`
-      fill: none;
-      stroke: rgba(255, 255, 255, 1);
-      stroke-width: 0.75px;
+      // fill: none;
+      stroke: ${theme.colors.text};
+      shape-rendering: crispEdges;
     `,
     paths: css`
       position: relative;
@@ -150,5 +151,27 @@ export const getStyles = stylesFactory(() => {
         user-select: none;
       }
     `,
+    chartMaskId: css`
+      fill: none;
+      user-select: none;
+    `,
+    placeholder: {
+      __noData: css`
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: ${theme.palette.redBase};
+        height: 100%;
+        user-select: none;
+      `,
+    },
+    forcedHidden: {
+      __barLabel: css`
+        opacity: 0 !important;
+        transform: translate(0, -100px);
+      `,
+    },
   };
 });

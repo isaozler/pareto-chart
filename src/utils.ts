@@ -5,3 +5,6 @@ export const getTextLabelClass = (bandWidth: number, styles: any, i: number, ste
     ? `${styles.textLabel.__smallBar} --small`
     : `${styles.textLabel.__hidden} --hidden`;
 };
+
+export const tickFilter = (highestVitalFewValue: number, maxCount: number) => (pVal: any, i: number) =>
+  pVal === highestVitalFewValue || maxCount === i;
