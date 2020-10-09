@@ -30,6 +30,7 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
         settings: {
           min: 0,
         },
+        defaultValue: 2,
         showIf: c => c.showBarValue,
       })
       /**
