@@ -17,14 +17,21 @@ export const TooltipComponent = (props: any) => {
   const styles = getStyles();
   const tooltipRef = useRef(null);
   const tooltipContentRef = useRef(null);
+  const barClickEventHandler = (e: any) => {
+    barClickHandler(tooltipRef, props, e);
+  };
+  const barMoveEventHandler = (e: any) => {
+    tooltipHandler(tooltipRef, tooltipContentRef, props, e);
+  };
 
   useEffect(() => {
-    eventBus.on(CONSTANTS.E_TOOLTIP_CLICK, (e: any) => {
-      barClickHandler(tooltipRef, props, e);
-    });
-    eventBus.on(CONSTANTS.E_TOOLTIP_MOVE, (e: any) => {
-      tooltipHandler(tooltipRef, tooltipContentRef, props, e);
-    });
+    eventBus.on(CONSTANTS.E_TOOLTIP_CLICK, barClickEventHandler);
+    eventBus.on(CONSTANTS.E_TOOLTIP_MOVE, barMoveEventHandler);
+
+    return () => {
+      eventBus.remove(CONSTANTS.E_TOOLTIP_CLICK, barClickEventHandler);
+      eventBus.remove(CONSTANTS.E_TOOLTIP_MOVE, barMoveEventHandler);
+    };
   }, []);
 
   return (
