@@ -7,7 +7,7 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
     builder
       .addBooleanSwitch({
         path: 'showVitalFew',
-        name: 'Show vital few line?',
+        name: 'Show vital few line',
         description: 'Indicates that many defects come from relatively few causes.',
         defaultValue: true,
       })
@@ -19,13 +19,13 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
       })
       .addBooleanSwitch({
         path: 'showBarValue',
-        name: 'Show bar values?',
+        name: 'Show bar values',
         description: 'Show the bar values on top of the bars?',
         defaultValue: false,
       })
       .addNumberInput({
         path: 'valToFixed',
-        name: 'Number of decimals?',
+        name: 'Number of decimals',
         description: 'Set number of decimals in bar values.',
         settings: {
           min: 0,
