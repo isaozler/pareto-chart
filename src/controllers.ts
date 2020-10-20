@@ -62,12 +62,18 @@ export class PanelDataController {
   }
 
   private stripName(name: string) {
-    const [fullTagName, tagName] = name.match(/\{.*:+(.*)\}/);
+    const string = name.match(/\{.*:+(.*)\}/);
+
+    if (!string) return name;
+
+    const [fullTagName, tagName] = string;
+
     if (!!tagName) {
       return tagName.trim();
     } else if (!!fullTagName) {
       return fullTagName.trim();
     }
+
     return name;
   }
 

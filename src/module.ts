@@ -33,6 +33,23 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
         defaultValue: 2,
         showIf: c => c.showBarValue,
       })
+      .addColorPicker({
+        path: 'vitalColor',
+        name: 'Vital few color',
+        // defaultValue: theme.palette.brandDanger,
+      })
+      .addColorPicker({
+        path: 'trivialColor',
+        name: 'Trivial many color',
+        description: '',
+        // defaultValue: theme.palette.brandSuccess,
+      })
+      .addColorPicker({
+        path: 'barHoverColor',
+        name: 'Bar hover color',
+        description: 'Set color for bar on hover',
+        // defaultValue: theme.palette.brandSuccess,
+      })
       /**
        * Will add the slider input once implementation is done :)
        */

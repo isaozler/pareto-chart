@@ -3,6 +3,7 @@ import { getStyles } from './styles';
 import { select as d3Select } from 'd3';
 import { eventBus } from './eventBus';
 import { CONSTANTS } from './constants';
+import { camelCase } from './utils';
 
 const contents = {
   initCopyText: 'Click on bar to copy data',
@@ -67,7 +68,9 @@ export const tooltipHandler = (
 
     d3Select(tooltipContentDiv).style(
       'background',
-      isVital === 'true' ? props.theme.palette.greenBase : props.theme.palette.redBase
+      isVital === 'true'
+        ? !!props.vitalColor ? camelCase(props.vitalColor) : props.theme.palette.greenBase
+        : !!props.trivialColor ? camelCase(props.trivialColor) : props.theme.palette.redBase
     ).html(`<label class="label-header">${labelHeader}
       ${
         !!contents.copyText ? getCopyLabel(props, contents.copyText) : getCopyLabel(props, contents.initCopyText)

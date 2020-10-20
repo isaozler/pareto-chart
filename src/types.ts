@@ -5,4 +5,7 @@ export interface ParetoOptions {
   showBarValue: boolean;
   barPadding: number;
   valToFixed: number;
+  vitalColor: string;
+  trivialColor: string;
+  barHoverColor: string;
 }

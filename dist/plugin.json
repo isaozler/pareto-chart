@@ -20,7 +20,7 @@
       { "name": "Pareto Chart Edit Dashboard", "path": "img/pareto-chart-edit-panel.jpg" }
     ],
     "version": "0.2.6",
-    "updated": "2020-10-14"
+    "updated": "2020-10-20"
   },
   "dependencies": {
     "grafanaDependency": ">=7.0.0",

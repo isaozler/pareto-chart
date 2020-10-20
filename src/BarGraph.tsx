@@ -8,8 +8,9 @@ import {
   line as d3Line,
   curveBasis as d3LineCurve,
 } from 'd3';
+import { css } from 'emotion';
 import { GraphData } from './controllers';
-import { getTextLabelClass, debounce } from './utils';
+import { getTextLabelClass, debounce, camelCase } from './utils';
 import { eventBus } from './eventBus';
 import { CONSTANTS } from './constants';
 
@@ -40,7 +41,7 @@ export function BarGraph(data: GraphData, { options, width, height }: BarGraphSe
   const line = d3Line()
     .curve(d3LineCurve)
     .x((d, i) => x(i) || 0)
-    .y((d: any) => p(d.p / 100));
+    .y((d: any) => (!!d) ? p(d.p / 100) : d);
   const pLabels = (n: any, index: number): string => {
     if (index === 0 || !n || !!!n) {
       return ``;
@@ -94,6 +95,9 @@ const Component: React.FC<any> = ({
   showBarValue,
   valToFixed,
   chartId,
+  vitalColor,
+  trivialColor,
+  barHoverColor,
 }) => {
   let issetVitalFewLine = false;
   const setIssetVitalFewLine = (state: boolean): boolean => {
@@ -131,8 +135,15 @@ const Component: React.FC<any> = ({
         return (
           <>
             <rect
-              className={styles.bar}
-              fill={isVital ? theme.palette.greenBase : theme.palette.redBase}
+              className={[styles.bar, !!barHoverColor ? css`
+                &:hover {
+                  fill: ${camelCase(barHoverColor)} !important;
+                }
+              `: ''].join(' ')}
+              fill={isVital 
+                ? !!vitalColor ? camelCase(vitalColor) : theme.palette.greenBase
+                : !!trivialColor ? camelCase(trivialColor) : theme.palette.redBase
+              }
               data-label-header={data.x[i]}
               data-label={data.tooltipLabel[i]}
               data-count={val}
