@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   select as d3Select,
   max as d3Max,
@@ -101,13 +101,7 @@ const Component: React.FC<any> = ({
   vitalLineColor,
   trivialColor,
   barHoverColor,
-  ...props
 }) => {
-  let issetVitalFewLine = false;
-  const setIssetVitalFewLine = (state: boolean): boolean => {
-    issetVitalFewLine = state;
-    return true;
-  };
   const hasVitals = !!data.p.filter((d: number, i: number) => d < vitalBreakpointVal).length;
   const bandwidth = xBand.bandwidth() * 0.9;
   const barClickHandler = (event: any) => eventBus.dispatch(`${chartId}-${CONSTANTS.E_TOOLTIP_CLICK}`, event);
@@ -117,6 +111,7 @@ const Component: React.FC<any> = ({
   const getFillColor = (isVital: boolean) => isVital 
     ? !!vitalColor ? camelCase(vitalColor) : theme.palette.brandDanger
     : !!trivialColor ? camelCase(trivialColor) : theme.palette.brandWarning;
+  let showVitalVerticalLineIndex = 0;
 
   return (
     <g clipPath={`url(#${chartId})`} className="bars" transform={`translate(${padding}, 0)`}>
@@ -152,7 +147,12 @@ const Component: React.FC<any> = ({
           isVital = false;
         }
 
+        showVitalVerticalLineIndex = !hasVitals && i === 0 ? 0
+          : data.p[i] < vitalBreakpointVal && !isInclusive ? i
+          : isInclusive && (data.p[i-1] < vitalBreakpointVal) ? i
+          : showVitalVerticalLineIndex;
         const textLabelClass = getTextLabelClass(bandwidth, styles, i, step);
+
         return (
           <>
             <rect
@@ -188,7 +188,7 @@ const Component: React.FC<any> = ({
             />
             <BarLabel index={i} className={['bar-values', textLabelClass].join(' ')} />
             <>
-              {!isVital && showVitalFew && !issetVitalFewLine && setIssetVitalFewLine(true) && (
+              {showVitalFew && i === data.y.length - 1 && (
                 <line
                   className={['line--vertical', styles.lineCutOff, css`
                     stroke: ${!!vitalLineColor ? vitalLineColor : 'rgba(255, 0, 0, 0.75)'};
@@ -196,8 +196,8 @@ const Component: React.FC<any> = ({
                   transform={`translate(${0}, 0)`}
                   ref={node => {
                     d3Select(node)
-                      .attr('x1', currentX + bandwidth / 2)
-                      .attr('x2', currentX + bandwidth / 2)
+                      .attr('x1', (x(showVitalVerticalLineIndex) - bandwidth / 2) + bandwidth / 2)
+                      .attr('x2', (x(showVitalVerticalLineIndex) - bandwidth / 2) + bandwidth / 2)
                       .attr('y1', 0)
                       .attr('y2', chartHeight);
                   }}

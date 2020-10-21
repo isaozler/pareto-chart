@@ -462,16 +462,7 @@ var Component = function Component(_a) {
       vitalColor = _a.vitalColor,
       vitalLineColor = _a.vitalLineColor,
       trivialColor = _a.trivialColor,
-      barHoverColor = _a.barHoverColor,
-      props = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__rest"])(_a, ["data", "styles", "theme", "padding", "x", "xBand", "y", "p", "chartHeight", "chartWidth", "vitalBreakpointVal", "isInclusive", "showVitalFew", "showBarValue", "valToFixed", "chartId", "vitalColor", "vitalLineColor", "trivialColor", "barHoverColor"]);
-
-  var issetVitalFewLine = false;
-
-  var setIssetVitalFewLine = function setIssetVitalFewLine(state) {
-    issetVitalFewLine = state;
-    return true;
-  };
-
+      barHoverColor = _a.barHoverColor;
   var hasVitals = !!data.p.filter(function (d, i) {
     return d < vitalBreakpointVal;
   }).length;
@@ -492,6 +483,7 @@ var Component = function Component(_a) {
     return isVital ? !!vitalColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_4__["camelCase"])(vitalColor) : theme.palette.brandDanger : !!trivialColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_4__["camelCase"])(trivialColor) : theme.palette.brandWarning;
   };
 
+  var showVitalVerticalLineIndex = 0;
   return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("g", {
     clipPath: "url(#" + chartId + ")",
     className: "bars",
@@ -529,6 +521,7 @@ var Component = function Component(_a) {
       isVital = false;
     }
 
+    showVitalVerticalLineIndex = !hasVitals && i === 0 ? 0 : data.p[i] < vitalBreakpointVal && !isInclusive ? i : isInclusive && data.p[i - 1] < vitalBreakpointVal ? i : showVitalVerticalLineIndex;
     var textLabelClass = Object(_utils__WEBPACK_IMPORTED_MODULE_4__["getTextLabelClass"])(bandwidth, styles, i, step);
     return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_1___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("rect", {
       className: [styles.bar, !!barHoverColor ? Object(emotion__WEBPACK_IMPORTED_MODULE_3__["css"])(templateObject_1 || (templateObject_1 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n                &:hover {\n                  fill: ", " !important;\n                }\n              "], ["\n                &:hover {\n                  fill: ", " !important;\n                }\n              "])), Object(_utils__WEBPACK_IMPORTED_MODULE_4__["camelCase"])(barHoverColor)) : ''].join(' '),
@@ -587,11 +580,11 @@ var Component = function Component(_a) {
     }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(BarLabel, {
       index: i,
       className: ['bar-values', textLabelClass].join(' ')
-    }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_1___default.a.Fragment, null, !isVital && showVitalFew && !issetVitalFewLine && setIssetVitalFewLine(true) && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("line", {
+    }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_1___default.a.Fragment, null, showVitalFew && i === data.y.length - 1 && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("line", {
       className: ['line--vertical', styles.lineCutOff, Object(emotion__WEBPACK_IMPORTED_MODULE_3__["css"])(templateObject_2 || (templateObject_2 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n                    stroke: ", ";\n                  "], ["\n                    stroke: ", ";\n                  "])), !!vitalLineColor ? vitalLineColor : 'rgba(255, 0, 0, 0.75)')].join(' '),
       transform: "translate(" + 0 + ", 0)",
       ref: function ref(node) {
-        Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(node).attr('x1', currentX + bandwidth / 2).attr('x2', currentX + bandwidth / 2).attr('y1', 0).attr('y2', chartHeight);
+        Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(node).attr('x1', x(showVitalVerticalLineIndex) - bandwidth / 2 + bandwidth / 2).attr('x2', x(showVitalVerticalLineIndex) - bandwidth / 2 + bandwidth / 2).attr('y1', 0).attr('y2', chartHeight);
       }
     })));
   }));
@@ -723,17 +716,19 @@ var BrushComponent = function BrushComponent(props) {
       svg.select('.axis-left').transition(transition_1).call(Object(d3__WEBPACK_IMPORTED_MODULE_3__["axisLeft"])(props.y));
       svg.select('.axis-right').transition(transition_1).call(Object(d3__WEBPACK_IMPORTED_MODULE_3__["axisLeft"])(props.p).ticks(4).tickFormat(props.pLabels));
       var i_1 = 0;
-      var issetVitalFewLine_1 = false;
+      var showVitalVerticalLineIndex_1 = 0;
       var bandWidth_1 = props.xBand.bandwidth();
       var bandWidth50_1 = bandWidth_1 / 2;
-      svg.selectAll("rect." + styles.bar).each(function () {
+      var allBarEls_1 = svg.selectAll("rect." + styles.bar);
+      allBarEls_1.each(function () {
         if (this.dataset) {
           var newCurrentX = props.x(i_1) - bandWidth50_1;
+          var isVital = this.dataset.isVital;
+          showVitalVerticalLineIndex_1 = isVital === 'true' ? i_1 : showVitalVerticalLineIndex_1;
           Object(d3__WEBPACK_IMPORTED_MODULE_3__["select"])(this).transition(transition_1).attr('x', newCurrentX).attr('width', bandWidth_1);
 
-          if (props.showVitalFew && props.data.p[i_1] > props.vitalBreakpointVal && !issetVitalFewLine_1) {
-            issetVitalFewLine_1 = true;
-            var xPos = newCurrentX + bandWidth50_1;
+          if (props.showVitalFew && i_1 === allBarEls_1.size() - 1) {
+            var xPos = props.x(showVitalVerticalLineIndex_1) - bandWidth50_1 + bandWidth50_1;
             svg.select('.line--vertical').transition(transition_1).attr('x1', xPos).attr('x2', xPos).attr('y1', 0).attr('y2', props.chartHeight);
           }
         }
@@ -794,10 +789,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3 */ "d3");
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(d3__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils */ "./utils.ts");
-/* harmony import */ var emotion__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! emotion */ "emotion");
-/* harmony import */ var emotion__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(emotion__WEBPACK_IMPORTED_MODULE_4__);
-
+/* harmony import */ var emotion__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! emotion */ "emotion");
+/* harmony import */ var emotion__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(emotion__WEBPACK_IMPORTED_MODULE_3__);
 
 
 
@@ -820,13 +813,13 @@ var PathsComponent = function PathsComponent(_a) {
     clipPath: "url(#" + chartId + ")",
     className: styles.paths
   }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("path", {
-    className: ['line--curve', styles.line, Object(emotion__WEBPACK_IMPORTED_MODULE_4__["css"])(templateObject_1 || (templateObject_1 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n          stroke: ", ";\n        "], ["\n          stroke: ", ";\n        "])), !!curveLineColor ? curveLineColor : theme.colors.text)].join(' '),
+    className: ['line--curve', styles.line, Object(emotion__WEBPACK_IMPORTED_MODULE_3__["css"])(templateObject_1 || (templateObject_1 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n          stroke: ", ";\n        "], ["\n          stroke: ", ";\n        "])), !!curveLineColor ? curveLineColor : theme.colors.text)].join(' '),
     transform: "translate(" + padding + ", 0)",
     ref: function ref(node) {
       Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(node).datum(pathData).attr('d', line);
     }
   }), showVitalFew && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("line", {
-    className: ['line--horizontal', styles.lineCutOff, Object(emotion__WEBPACK_IMPORTED_MODULE_4__["css"])(templateObject_2 || (templateObject_2 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n            stroke: ", ";\n          "], ["\n            stroke: ", ";\n          "])), !!vitalLineColor ? vitalLineColor : theme.palette.brandDanger)].join(' '),
+    className: ['line--horizontal', styles.lineCutOff, Object(emotion__WEBPACK_IMPORTED_MODULE_3__["css"])(templateObject_2 || (templateObject_2 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n            stroke: ", ";\n          "], ["\n            stroke: ", ";\n          "])), !!vitalLineColor ? vitalLineColor : theme.palette.brandDanger)].join(' '),
     transform: "translate(" + (padding + xBand.bandwidth() / 2) + ", 0)",
     ref: function ref(node) {
       Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(node).attr('x1', 0).attr('x2', chartWidth - padding).attr('y1', p(vitalBreakpointVal / 100)).attr('y2', p(vitalBreakpointVal / 100));
@@ -844,7 +837,8 @@ var AxisComponent = function AxisComponent(_a) {
       y = _a.y,
       p = _a.p,
       pLabels = _a.pLabels,
-      vitalBreakpointVal = _a.vitalBreakpointVal;
+      vitalBreakpointVal = _a.vitalBreakpointVal,
+      isInclusive = _a.isInclusive;
   var hasVitals = !!data.p.filter(function (d) {
     return d < vitalBreakpointVal;
   }).length;
@@ -853,22 +847,21 @@ var AxisComponent = function AxisComponent(_a) {
     return data.p[i] < vitalBreakpointVal || !hasVitals && i === 0;
   };
 
+  var pList = data.p.filter(isVital).sort(function (a, b) {
+    return a - b;
+  });
   return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("g", {
     className: ['axis', styles.axis].join(' ')
   }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("g", {
     className: "axis-bottom",
     transform: "translate(" + padding + ", " + (chartHeight + 15) + ")",
     ref: function ref(node) {
-      var _a = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__read"])(data.p.filter(isVital).sort(function (a, b) {
-        return b - a;
-      }), 1),
-          highestVitalFewValue = _a[0];
+      var _a = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__read"])(data.xAxisLabels.filter(function (xLabel, index) {
+        return !!pList[index] || isInclusive && pList[index - 1] < vitalBreakpointVal && !pList[index + 1];
+      }).reverse(), 1),
+          breakpointXLabel = _a[0];
 
-      var i = data.p.findIndex(function (pV) {
-        return pV === highestVitalFewValue;
-      });
-      var filterHandler = Object(_utils__WEBPACK_IMPORTED_MODULE_3__["tickFilter"])(data.xAxisLabels[i + 1], data.p.length - 1);
-      var xPAxis = Object(d3__WEBPACK_IMPORTED_MODULE_2__["axisBottom"])(xPBand).tickValues(data.xAxisLabels.filter(filterHandler));
+      var xPAxis = Object(d3__WEBPACK_IMPORTED_MODULE_2__["axisBottom"])(xPBand).tickValues([breakpointXLabel, '100 %']);
       Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(node).call(xPAxis).selectAll('text').attr('y', padding / 2).attr('x', 0).style('text-anchor', 'center');
     }
   }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("line", {

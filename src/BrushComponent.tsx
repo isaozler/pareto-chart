@@ -127,22 +127,24 @@ export const BrushComponent = (props: any) => {
         );
 
       let i = 0;
-      let issetVitalFewLine = false;
+      let showVitalVerticalLineIndex = 0;
       const bandWidth = props.xBand.bandwidth();
       const bandWidth50 = bandWidth / 2;
-
-      svg.selectAll(`rect.${styles.bar}`).each(function(this: any) {
+      const allBarEls = svg.selectAll(`rect.${styles.bar}`);
+      
+      allBarEls.each(function(this: any) {
         if (this.dataset) {
           const newCurrentX: number = props.x(i) - bandWidth50;
+          const { isVital } = this.dataset;
+          showVitalVerticalLineIndex = isVital === 'true' ? i : showVitalVerticalLineIndex;
 
           d3Select(this)
             .transition(transition)
             .attr('x', newCurrentX)
             .attr('width', bandWidth);
 
-          if (props.showVitalFew && props.data.p[i] > props.vitalBreakpointVal && !issetVitalFewLine) {
-            issetVitalFewLine = true;
-            const xPos = newCurrentX + bandWidth50;
+          if (props.showVitalFew && i === allBarEls.size() - 1) {
+            const xPos = props.x(showVitalVerticalLineIndex) - bandWidth50 + bandWidth50;
 
             svg
               .select('.line--vertical')

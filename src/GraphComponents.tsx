@@ -1,6 +1,5 @@
 import React from 'react';
 import { select as d3Select, axisBottom as d3AxisBottom, axisLeft as d3AxisLeft } from 'd3';
-import { tickFilter } from './utils';
 import { css } from 'emotion';
 
 interface PathsComponentInterface {
@@ -29,6 +28,7 @@ interface AxisComponentInterface {
   styles: any;
   line: any;
   vitalBreakpointVal: number;
+  isInclusive: boolean;
   bottomLineData: any;
   chartHeight: number;
   chartWidth: number;
@@ -98,9 +98,11 @@ export const AxisComponent = ({
   p,
   pLabels,
   vitalBreakpointVal,
+  isInclusive,
 }: AxisComponentInterface) => {
   const hasVitals = !!data.p.filter((d: number) => d < vitalBreakpointVal).length;
   const isVital = (_: any, i: number) => data.p[i] < vitalBreakpointVal || (!hasVitals && i === 0);
+  const pList = data.p.filter(isVital).sort((a: number, b: number) => a - b);
 
   return (
     <g className={['axis', styles.axis].join(' ')}>
@@ -108,10 +110,9 @@ export const AxisComponent = ({
         className="axis-bottom"
         transform={`translate(${padding}, ${chartHeight + 15})`}
         ref={node => {
-          const [highestVitalFewValue] = data.p.filter(isVital).sort((a: number, b: number) => b - a);
-          const i: number = data.p.findIndex((pV: number) => pV === highestVitalFewValue);
-          const filterHandler = tickFilter(data.xAxisLabels[i + 1], data.p.length - 1);
-          const xPAxis = d3AxisBottom(xPBand).tickValues(data.xAxisLabels.filter(filterHandler));
+          const [breakpointXLabel] = data.xAxisLabels.filter((xLabel: string, index: number) =>
+            !!pList[index] || (isInclusive && pList[index - 1] < vitalBreakpointVal && !pList[index + 1])).reverse();
+          const xPAxis = d3AxisBottom(xPBand).tickValues([breakpointXLabel, '100 %']);
 
           d3Select(node)
             .call(xPAxis as any)
