@@ -6,7 +6,6 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
   return (
     builder
       .addBooleanSwitch({
-
         path: 'showVitalFew',
         name: 'Show vital few line',
         description: 'Indicates that many defects come from relatively few causes.',

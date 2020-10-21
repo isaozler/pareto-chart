@@ -47,9 +47,9 @@ export const throttle = <F extends (...args: any[]) => any>(func: F, waitFor: nu
 };
 
 export const camelCase = (input: string): string => {
-  if (input.indexOf('rgb') === 0) return input;
-  
-  return input
-    .toLowerCase()
-    .replace(/-(.)/g, (match, group1) => group1.toUpperCase());
+  if (input.indexOf('rgb') === 0) {
+    return input;
+  }
+
+  return input.toLowerCase().replace(/-(.)/g, (match, group1) => group1.toUpperCase());
 };

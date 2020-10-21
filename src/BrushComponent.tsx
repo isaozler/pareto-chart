@@ -131,7 +131,7 @@ export const BrushComponent = (props: any) => {
       const bandWidth = props.xBand.bandwidth();
       const bandWidth50 = bandWidth / 2;
       const allBarEls = svg.selectAll(`rect.${styles.bar}`);
-      
+
       allBarEls.each(function(this: any) {
         if (this.dataset) {
           const newCurrentX: number = props.x(i) - bandWidth50;

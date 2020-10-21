@@ -9,8 +9,9 @@ This plugin provides you the ability to draw a Pareto chart with `RDB` and `Time
 - Pan and zoom for detailed info without changing date range
 - Set decimals count on displayed values
 - Specify bar spacing
-- Quickly copy bar value to clipboard simply by clicking on the bar
+- Quickly copy bar data to clipboard simply by clicking on the bar
 - Option to show/hide bar values on default
+- Style graphs to need
 
 # TimeSeries (InfluxDB) dashboard impression
 

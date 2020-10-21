@@ -6,15 +6,21 @@ export interface GraphData {
   [key: string]: any;
 }
 
+interface Error {
+  message: string;
+}
+
 export class PanelDataController {
   dataType: string;
-  results: GraphData;
+  results: GraphData | null;
+  error: Error | null;
 
   constructor(data: any) {
     const [target] = data.request.targets;
     const { resultFormat } = target;
     const [serie] = data.series;
     const { fields, meta } = serie;
+    this.error = null;
 
     if (!!meta && !!meta.executedQueryString && resultFormat !== 'time_series') {
       this.dataType = 'table';
@@ -29,7 +35,10 @@ export class PanelDataController {
   }
 
   getResults() {
-    return this.results;
+    return {
+      results: this.results,
+      error: this.error,
+    };
   }
 
   private setTableData(fields: any) {
@@ -64,7 +73,9 @@ export class PanelDataController {
   private stripName(name: string) {
     const string = name.match(/\{.*:+(.*)\}/);
 
-    if (!string) return name;
+    if (!string) {
+      return name;
+    }
 
     const [fullTagName, tagName] = string;
 
@@ -78,6 +89,14 @@ export class PanelDataController {
   }
 
   private setResults(xValues: string[], yValues: number[], yValuesSum: number) {
+    if (!!yValues.filter((y: number) => y < 0).length) {
+      this.results = null;
+      this.error = {
+        message: 'Column "counts" contains negative values',
+      };
+      return this.results;
+    }
+
     this.results = yValues
       .map((d, i) => ({ i, x: xValues[i], y: d }))
       .sort((a, b) => b.y - a.y)

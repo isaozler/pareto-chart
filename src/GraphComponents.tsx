@@ -57,9 +57,13 @@ export const PathsComponent = ({
   return (
     <g clipPath={`url(#${chartId})`} className={styles.paths}>
       <path
-        className={['line--curve', styles.line, css`
-          stroke: ${!!curveLineColor ? curveLineColor : theme.colors.text};
-        `].join(' ')}
+        className={[
+          'line--curve',
+          styles.line,
+          css`
+            stroke: ${!!curveLineColor ? curveLineColor : theme.colors.text};
+          `,
+        ].join(' ')}
         transform={`translate(${padding}, 0)`}
         ref={node => {
           d3Select(node)
@@ -69,9 +73,13 @@ export const PathsComponent = ({
       />
       {showVitalFew && (
         <line
-          className={['line--horizontal', styles.lineCutOff, css`
-            stroke: ${!!vitalLineColor ? vitalLineColor : theme.palette.brandDanger};
-          `].join(' ')}
+          className={[
+            'line--horizontal',
+            styles.lineCutOff,
+            css`
+              stroke: ${!!vitalLineColor ? vitalLineColor : theme.palette.brandDanger};
+            `,
+          ].join(' ')}
           transform={`translate(${padding + xBand.bandwidth() / 2}, 0)`}
           ref={node => {
             d3Select(node)
@@ -110,8 +118,12 @@ export const AxisComponent = ({
         className="axis-bottom"
         transform={`translate(${padding}, ${chartHeight + 15})`}
         ref={node => {
-          const [breakpointXLabel] = data.xAxisLabels.filter((xLabel: string, index: number) =>
-            !!pList[index] || (isInclusive && pList[index - 1] < vitalBreakpointVal && !pList[index + 1])).reverse();
+          const [breakpointXLabel] = data.xAxisLabels
+            .filter(
+              (_: string, index: number) =>
+                !!pList[index] || (isInclusive && pList[index - 1] < vitalBreakpointVal && !pList[index + 1])
+            )
+            .reverse();
           const xPAxis = d3AxisBottom(xPBand).tickValues([breakpointXLabel, '100 %']);
 
           d3Select(node)

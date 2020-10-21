@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   select as d3Select,
   max as d3Max,
@@ -41,7 +41,7 @@ export function BarGraph(data: GraphData, { options, width, height }: BarGraphSe
   const line = d3Line()
     .curve(d3LineCurve)
     .x((d, i) => x(i) || 0)
-    .y((d: any) => (!!d) ? p(d.p / 100) : d);
+    .y((d: any) => (!!d ? p(d.p / 100) : d));
   const pLabels = (n: any, index: number): string => {
     if (index === 0 || !n || !!!n) {
       return ``;
@@ -108,9 +108,14 @@ const Component: React.FC<any> = ({
   const barMoveHandler = (event: any) => eventBus.dispatch(`${chartId}-${CONSTANTS.E_TOOLTIP_MOVE}`, event);
   const debouncedClickHandler = debounce(barClickHandler, 200);
   const debouncedMoveHandler = debounce(barMoveHandler, 200);
-  const getFillColor = (isVital: boolean) => isVital 
-    ? !!vitalColor ? camelCase(vitalColor) : theme.palette.brandDanger
-    : !!trivialColor ? camelCase(trivialColor) : theme.palette.brandWarning;
+  const getFillColor = (isVital: boolean) =>
+    isVital
+      ? !!vitalColor
+        ? camelCase(vitalColor)
+        : theme.palette.brandDanger
+      : !!trivialColor
+      ? camelCase(trivialColor)
+      : theme.palette.brandWarning;
   let showVitalVerticalLineIndex = 0;
 
   return (
@@ -120,8 +125,10 @@ const Component: React.FC<any> = ({
         const step = Math.trunc(chartWidth / 10 / bandwidth);
         const defaultFixedVal = 2;
         const maxFixedVal = 6;
-        const label = typeof val === 'number' 
-          && valToFixed >= 0 ? val.toFixed(valToFixed > maxFixedVal ? defaultFixedVal : valToFixed) : val;
+        const label =
+          typeof val === 'number' && valToFixed >= 0
+            ? val.toFixed(valToFixed > maxFixedVal ? defaultFixedVal : valToFixed)
+            : val;
         const isForcedHidden = !showBarValue;
         const visibilityClassName = isForcedHidden ? styles.forcedHidden.__barLabel : '';
         const BarLabel = ({ index, className }: any) => (
@@ -136,31 +143,40 @@ const Component: React.FC<any> = ({
           </text>
         );
         let isVital;
-        
+
         if (!hasVitals && i === 0) {
           isVital = true;
         } else if (data.p[i] < vitalBreakpointVal && !isInclusive) {
           isVital = true;
-        } else if (isInclusive && (data.p[i-1] < vitalBreakpointVal || i === 0)) {
+        } else if (isInclusive && (data.p[i - 1] < vitalBreakpointVal || i === 0)) {
           isVital = true;
         } else {
           isVital = false;
         }
 
-        showVitalVerticalLineIndex = !hasVitals && i === 0 ? 0
-          : data.p[i] < vitalBreakpointVal && !isInclusive ? i
-          : isInclusive && (data.p[i-1] < vitalBreakpointVal) ? i
-          : showVitalVerticalLineIndex;
+        showVitalVerticalLineIndex =
+          !hasVitals && i === 0
+            ? 0
+            : data.p[i] < vitalBreakpointVal && !isInclusive
+            ? i
+            : isInclusive && data.p[i - 1] < vitalBreakpointVal
+            ? i
+            : showVitalVerticalLineIndex;
         const textLabelClass = getTextLabelClass(bandwidth, styles, i, step);
 
         return (
           <>
             <rect
-              className={[styles.bar, !!barHoverColor ? css`
-                &:hover {
-                  fill: ${camelCase(barHoverColor)} !important;
-                }
-              `: ''].join(' ')}
+              className={[
+                styles.bar,
+                !!barHoverColor
+                  ? css`
+                      &:hover {
+                        fill: ${camelCase(barHoverColor)} !important;
+                      }
+                    `
+                  : '',
+              ].join(' ')}
               fill={getFillColor(isVital)}
               data-label-header={data.x[i]}
               data-label={data.tooltipLabel[i]}
@@ -190,14 +206,18 @@ const Component: React.FC<any> = ({
             <>
               {showVitalFew && i === data.y.length - 1 && (
                 <line
-                  className={['line--vertical', styles.lineCutOff, css`
-                    stroke: ${!!vitalLineColor ? vitalLineColor : 'rgba(255, 0, 0, 0.75)'};
-                  `].join(' ')}
+                  className={[
+                    'line--vertical',
+                    styles.lineCutOff,
+                    css`
+                      stroke: ${!!vitalLineColor ? vitalLineColor : 'rgba(255, 0, 0, 0.75)'};
+                    `,
+                  ].join(' ')}
                   transform={`translate(${0}, 0)`}
                   ref={node => {
                     d3Select(node)
-                      .attr('x1', (x(showVitalVerticalLineIndex) - bandwidth / 2) + bandwidth / 2)
-                      .attr('x2', (x(showVitalVerticalLineIndex) - bandwidth / 2) + bandwidth / 2)
+                      .attr('x1', x(showVitalVerticalLineIndex) - bandwidth / 2 + bandwidth / 2)
+                      .attr('x2', x(showVitalVerticalLineIndex) - bandwidth / 2 + bandwidth / 2)
                       .attr('y1', 0)
                       .attr('y2', chartHeight);
                   }}

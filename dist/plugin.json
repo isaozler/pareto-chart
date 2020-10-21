@@ -19,7 +19,7 @@
       { "name": "Pareto Chart Dashboard Impression", "path": "img/production-env--impression.jpg" },
       { "name": "Pareto Chart Edit Dashboard", "path": "img/pareto-chart-edit-panel.jpg" }
     ],
-    "version": "0.2.6",
+    "version": "0.3.0",
     "updated": "2020-10-21"
   },
   "dependencies": {

@@ -24,7 +24,16 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height, id 
 
   const chartId = `chartMask_${id}`;
   const PanelData = new PanelDataController(data);
-  const graphData = PanelData.getResults();
+  const { results: graphData, error } = PanelData.getResults();
+
+  if (!!error || !graphData) {
+    return (
+      <div className={['placeholder--no-data', styles.placeholder.__noData].join(' ')}>
+        {error?.message || 'Invalid data'}
+      </div>
+    );
+  }
+
   const barGraphSettings = { options, width, height };
   const barGraphData = BarGraph(graphData, barGraphSettings);
   const props = {

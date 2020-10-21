@@ -36,7 +36,7 @@ export const TooltipComponent = (props: any) => {
   }, []);
 
   return (
-    <div ref={tooltipRef} className={['tooltip__container',styles.tooltipContainer,props.chartId,].join(' ')}>
+    <div ref={tooltipRef} className={['tooltip__container', styles.tooltipContainer, props.chartId].join(' ')}>
       <div ref={tooltipContentRef} className={styles.tooltip} />
     </div>
   );
@@ -68,9 +68,15 @@ export const tooltipHandler = (
 
     d3Select(tooltipContentDiv).style(
       'background',
-      !!fillColor ? fillColor : isVital === 'true'
-        ? !!props.vitalColor ? camelCase(props.vitalColor) : props.theme.palette.brandDanger
-        : !!props.trivialColor ? camelCase(props.trivialColor) : props.theme.palette.brandWarning
+      !!fillColor
+        ? fillColor
+        : isVital === 'true'
+        ? !!props.vitalColor
+          ? camelCase(props.vitalColor)
+          : props.theme.palette.brandDanger
+        : !!props.trivialColor
+        ? camelCase(props.trivialColor)
+        : props.theme.palette.brandWarning
     ).html(`<label class="label-header">${labelHeader}
       ${
         !!contents.copyText ? getCopyLabel(props, contents.copyText) : getCopyLabel(props, contents.initCopyText)
@@ -83,7 +89,11 @@ export const tooltipHandler = (
 };
 
 export const barClickHandler = (tooltipRef: any, props: any, event: React.MouseEvent<SVGRectElement, MouseEvent>) => {
-  const content = event.currentTarget?.dataset.labelHeader || 'No Content';
+  const content =
+    `${event.currentTarget?.dataset.labelHeader}
+    \r\nBar percentage: ${event.currentTarget?.dataset.label}
+    \r\nCumulative percentage: ${event.currentTarget?.dataset.label2}
+    \r\nCounts: ${event.currentTarget?.dataset.count}` || 'No Content';
   const textField = document.createElement('textarea');
   textField.innerText = content;
   const appendTo = !!tooltipRef.current ? tooltipRef.current : document.body;
