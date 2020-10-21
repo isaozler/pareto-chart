@@ -11,11 +11,23 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
         description: 'Indicates that many defects come from relatively few causes.',
         defaultValue: true,
       })
+      .addColorPicker({
+        path: 'vitalLineColor',
+        name: 'Breakpoint lines',
+        description: 'Horizontal and vertical lines indicating the vital few breakpoint',
+        showIf: c => c.showVitalFew,
+      })
       .addNumberInput({
         path: 'vitalBreakpointVal',
         name: 'Vital few value (%)',
         description: 'Default is 80 based on the 80/20 rule. But, you are able to customize this.',
         defaultValue: 20,
+      })
+      .addBooleanSwitch({
+        path: 'isInclusive',
+        name: 'Inclusive vital few',
+        description: 'Include bar with overlapping breakpoint value',
+        defaultValue: false,
       })
       .addBooleanSwitch({
         path: 'showBarValue',

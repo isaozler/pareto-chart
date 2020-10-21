@@ -1,6 +1,7 @@
 import React from 'react';
 import { select as d3Select, axisBottom as d3AxisBottom, axisLeft as d3AxisLeft } from 'd3';
 import { tickFilter } from './utils';
+import { css } from 'emotion';
 
 interface PathsComponentInterface {
   styles: any;
@@ -9,6 +10,7 @@ interface PathsComponentInterface {
   chartWidth: number;
   chartHeight: number;
   vitalBreakpointVal: number;
+  vitalLineColor: string;
   x: any;
   p: any;
   y: any;
@@ -41,6 +43,7 @@ export const PathsComponent = ({
   chartId,
   chartWidth,
   vitalBreakpointVal,
+  vitalLineColor,
   p,
   xBand,
   pathData,
@@ -60,7 +63,9 @@ export const PathsComponent = ({
       />
       {showVitalFew && (
         <line
-          className={['line--horizontal', styles.lineCutOff].join(' ')}
+          className={['line--horizontal', styles.lineCutOff, css`
+            stroke: ${!!vitalLineColor ? vitalLineColor : 'rgba(255, 0, 0, 0.75)'};
+          `].join(' ')}
           transform={`translate(${padding + xBand.bandwidth() / 2}, 0)`}
           ref={node => {
             d3Select(node)

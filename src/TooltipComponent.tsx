@@ -4,6 +4,7 @@ import { select as d3Select } from 'd3';
 import { eventBus } from './eventBus';
 import { CONSTANTS } from './constants';
 import { camelCase } from './utils';
+import { css } from 'emotion';
 
 const contents = {
   initCopyText: 'Click on bar to copy data',
@@ -26,17 +27,23 @@ export const TooltipComponent = (props: any) => {
   };
 
   useEffect(() => {
-    eventBus.on(CONSTANTS.E_TOOLTIP_CLICK, barClickEventHandler);
-    eventBus.on(CONSTANTS.E_TOOLTIP_MOVE, barMoveEventHandler);
+    eventBus.on(`${props.chartId}-${CONSTANTS.E_TOOLTIP_CLICK}`, barClickEventHandler);
+    eventBus.on(`${props.chartId}-${CONSTANTS.E_TOOLTIP_MOVE}`, barMoveEventHandler);
 
     return () => {
-      eventBus.remove(CONSTANTS.E_TOOLTIP_CLICK, barClickEventHandler);
-      eventBus.remove(CONSTANTS.E_TOOLTIP_MOVE, barMoveEventHandler);
+      eventBus.remove(`${props.chartId}-${CONSTANTS.E_TOOLTIP_CLICK}`, barClickEventHandler);
+      eventBus.remove(`${props.chartId}-${CONSTANTS.E_TOOLTIP_MOVE}`, barMoveEventHandler);
     };
   }, []);
 
   return (
-    <div ref={tooltipRef} className={['tooltip__container', styles.tooltipContainer].join(' ')}>
+    <div ref={tooltipRef} className={[
+        'tooltip__container',
+        styles.tooltipContainer,
+        props.chartId,
+        css`
+        `,
+      ].join(' ')}>
       <div ref={tooltipContentRef} className={styles.tooltip} />
     </div>
   );
@@ -50,7 +57,7 @@ export const tooltipHandler = (
 ) => {
   const { current: tooltipDiv } = tooltipRef || { current: null };
   const { current: tooltipContentDiv } = tooltipContentRef || { current: null };
-  const { labelHeader, label: labelValue, isVital, count } = event.currentTarget?.dataset || {};
+  const { labelHeader, label: labelValue, isVital, count, fillColor } = event.currentTarget?.dataset || {};
   const isVisible = ['mouseover', 'mousemove'].includes(event.type) ? true : false;
 
   if (event.type === 'mouseout') {
@@ -68,7 +75,7 @@ export const tooltipHandler = (
 
     d3Select(tooltipContentDiv).style(
       'background',
-      isVital === 'true'
+      !!fillColor ? fillColor : isVital === 'true'
         ? !!props.vitalColor ? camelCase(props.vitalColor) : props.theme.palette.greenBase
         : !!props.trivialColor ? camelCase(props.trivialColor) : props.theme.palette.redBase
     ).html(`<label class="label-header">${labelHeader}

@@ -91,11 +91,13 @@ const Component: React.FC<any> = ({
   chartHeight,
   chartWidth,
   vitalBreakpointVal,
+  isInclusive,
   showVitalFew,
   showBarValue,
   valToFixed,
   chartId,
   vitalColor,
+  vitalLineColor,
   trivialColor,
   barHoverColor,
 }) => {
@@ -106,10 +108,13 @@ const Component: React.FC<any> = ({
   };
   const hasVitals = !!data.p.filter((d: number, i: number) => d < vitalBreakpointVal).length;
   const bandwidth = xBand.bandwidth() * 0.9;
-  const barClickHandler = (event: any) => eventBus.dispatch(CONSTANTS.E_TOOLTIP_CLICK, event);
-  const barMoveHandler = (event: any) => eventBus.dispatch(CONSTANTS.E_TOOLTIP_MOVE, event);
+  const barClickHandler = (event: any) => eventBus.dispatch(`${chartId}-${CONSTANTS.E_TOOLTIP_CLICK}`, event);
+  const barMoveHandler = (event: any) => eventBus.dispatch(`${chartId}-${CONSTANTS.E_TOOLTIP_MOVE}`, event);
   const debouncedClickHandler = debounce(barClickHandler, 200);
   const debouncedMoveHandler = debounce(barMoveHandler, 200);
+  const getFillColor = (isVital: boolean) => isVital 
+    ? !!vitalColor ? camelCase(vitalColor) : theme.palette.greenBase
+    : !!trivialColor ? camelCase(trivialColor) : theme.palette.redBase;
 
   return (
     <g clipPath={`url(#${chartId})`} className="bars" transform={`translate(${padding}, 0)`}>
@@ -130,7 +135,18 @@ const Component: React.FC<any> = ({
             {label}
           </text>
         );
-        const isVital = data.p[i] < vitalBreakpointVal || (!hasVitals && i === 0);
+        let isVital;
+        
+        if (!hasVitals && i === 0) {
+          isVital = true;
+        } else if (data.p[i] < vitalBreakpointVal && !isInclusive) {
+          isVital = true;
+        } else if (isInclusive && (data.p[i-1] < vitalBreakpointVal || i === 0)) {
+          isVital = true;
+        } else {
+          isVital = false;
+        }
+
         const textLabelClass = getTextLabelClass(bandwidth, styles, i, step);
         return (
           <>
@@ -140,14 +156,12 @@ const Component: React.FC<any> = ({
                   fill: ${camelCase(barHoverColor)} !important;
                 }
               `: ''].join(' ')}
-              fill={isVital 
-                ? !!vitalColor ? camelCase(vitalColor) : theme.palette.greenBase
-                : !!trivialColor ? camelCase(trivialColor) : theme.palette.redBase
-              }
+              fill={getFillColor(isVital)}
               data-label-header={data.x[i]}
               data-label={data.tooltipLabel[i]}
               data-count={val}
               data-is-vital={isVital}
+              data-fill-color={getFillColor(isVital)}
               onMouseUp={({ currentTarget }) => debouncedClickHandler({ currentTarget })}
               onMouseOver={({ currentTarget, type, pageX, pageY }) =>
                 debouncedMoveHandler({ currentTarget, type, pageX, pageY })
@@ -170,7 +184,9 @@ const Component: React.FC<any> = ({
             <>
               {!isVital && showVitalFew && !issetVitalFewLine && setIssetVitalFewLine(true) && (
                 <line
-                  className={['line--vertical', styles.lineCutOff].join(' ')}
+                  className={['line--vertical', styles.lineCutOff, css`
+                    stroke: ${!!vitalLineColor ? vitalLineColor : 'rgba(255, 0, 0, 0.75)'};
+                  `].join(' ')}
                   transform={`translate(${0}, 0)`}
                   ref={node => {
                     d3Select(node)

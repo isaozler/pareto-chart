@@ -112,7 +112,6 @@ export const getStyles = stylesFactory(() => {
     `,
     lineCutOff: css`
       fill: none;
-      stroke: rgba(255, 0, 0, 0.75);
       stroke-width: 2px;
       stroke-dasharray: 5px;
     `,
