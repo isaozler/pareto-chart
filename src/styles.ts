@@ -106,7 +106,6 @@ export const getStyles = stylesFactory(() => {
     `,
     line: css`
       fill: none;
-      stroke: ${theme.colors.text};
       stroke-width: 2px;
       shape-rendering: geometricPrecision;
     `,

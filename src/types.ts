@@ -6,6 +6,7 @@ export interface ParetoOptions {
   isInclusive: boolean;
   barPadding: number;
   valToFixed: number;
+  curveLineColor: string;
   vitalColor: string;
   trivialColor: string;
   barHoverColor: string;

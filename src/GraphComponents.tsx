@@ -4,6 +4,7 @@ import { tickFilter } from './utils';
 import { css } from 'emotion';
 
 interface PathsComponentInterface {
+  theme: any;
   styles: any;
   padding: number;
   chartId: string;
@@ -11,6 +12,7 @@ interface PathsComponentInterface {
   chartHeight: number;
   vitalBreakpointVal: number;
   vitalLineColor: string;
+  curveLineColor: string;
   x: any;
   p: any;
   y: any;
@@ -38,12 +40,14 @@ interface AxisComponentInterface {
 }
 
 export const PathsComponent = ({
+  theme,
   styles,
   padding,
   chartId,
   chartWidth,
   vitalBreakpointVal,
   vitalLineColor,
+  curveLineColor,
   p,
   xBand,
   pathData,
@@ -53,7 +57,9 @@ export const PathsComponent = ({
   return (
     <g clipPath={`url(#${chartId})`} className={styles.paths}>
       <path
-        className={['line--curve', styles.line].join(' ')}
+        className={['line--curve', styles.line, css`
+          stroke: ${!!curveLineColor ? curveLineColor : theme.colors.text};
+        `].join(' ')}
         transform={`translate(${padding}, 0)`}
         ref={node => {
           d3Select(node)
@@ -64,7 +70,7 @@ export const PathsComponent = ({
       {showVitalFew && (
         <line
           className={['line--horizontal', styles.lineCutOff, css`
-            stroke: ${!!vitalLineColor ? vitalLineColor : 'rgba(255, 0, 0, 0.75)'};
+            stroke: ${!!vitalLineColor ? vitalLineColor : theme.palette.brandDanger};
           `].join(' ')}
           transform={`translate(${padding + xBand.bandwidth() / 2}, 0)`}
           ref={node => {

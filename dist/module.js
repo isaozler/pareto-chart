@@ -450,6 +450,7 @@ var Component = function Component(_a) {
       x = _a.x,
       xBand = _a.xBand,
       y = _a.y,
+      p = _a.p,
       chartHeight = _a.chartHeight,
       chartWidth = _a.chartWidth,
       vitalBreakpointVal = _a.vitalBreakpointVal,
@@ -461,7 +462,9 @@ var Component = function Component(_a) {
       vitalColor = _a.vitalColor,
       vitalLineColor = _a.vitalLineColor,
       trivialColor = _a.trivialColor,
-      barHoverColor = _a.barHoverColor;
+      barHoverColor = _a.barHoverColor,
+      props = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__rest"])(_a, ["data", "styles", "theme", "padding", "x", "xBand", "y", "p", "chartHeight", "chartWidth", "vitalBreakpointVal", "isInclusive", "showVitalFew", "showBarValue", "valToFixed", "chartId", "vitalColor", "vitalLineColor", "trivialColor", "barHoverColor"]);
+
   var issetVitalFewLine = false;
 
   var setIssetVitalFewLine = function setIssetVitalFewLine(state) {
@@ -486,7 +489,7 @@ var Component = function Component(_a) {
   var debouncedMoveHandler = Object(_utils__WEBPACK_IMPORTED_MODULE_4__["debounce"])(barMoveHandler, 200);
 
   var getFillColor = function getFillColor(isVital) {
-    return isVital ? !!vitalColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_4__["camelCase"])(vitalColor) : theme.palette.greenBase : !!trivialColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_4__["camelCase"])(trivialColor) : theme.palette.redBase;
+    return isVital ? !!vitalColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_4__["camelCase"])(vitalColor) : theme.palette.brandDanger : !!trivialColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_4__["camelCase"])(trivialColor) : theme.palette.brandWarning;
   };
 
   return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("g", {
@@ -496,7 +499,9 @@ var Component = function Component(_a) {
   }, data.y.map(function (val, i) {
     var currentX = x(i) - bandwidth / 2;
     var step = Math.trunc(chartWidth / 10 / bandwidth);
-    var label = typeof val === 'number' && valToFixed >= 0 ? val.toFixed(valToFixed) : val;
+    var defaultFixedVal = 2;
+    var maxFixedVal = 6;
+    var label = typeof val === 'number' && valToFixed >= 0 ? val.toFixed(valToFixed > maxFixedVal ? defaultFixedVal : valToFixed) : val;
     var isForcedHidden = !showBarValue;
     var visibilityClassName = isForcedHidden ? styles.forcedHidden.__barLabel : '';
 
@@ -530,6 +535,7 @@ var Component = function Component(_a) {
       fill: getFillColor(isVital),
       "data-label-header": data.x[i],
       "data-label": data.tooltipLabel[i],
+      "data-label2": data.p[i].toFixed(2) + "%",
       "data-count": val,
       "data-is-vital": isVital,
       "data-fill-color": getFillColor(isVital),
@@ -797,12 +803,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var PathsComponent = function PathsComponent(_a) {
-  var styles = _a.styles,
+  var theme = _a.theme,
+      styles = _a.styles,
       padding = _a.padding,
       chartId = _a.chartId,
       chartWidth = _a.chartWidth,
       vitalBreakpointVal = _a.vitalBreakpointVal,
       vitalLineColor = _a.vitalLineColor,
+      curveLineColor = _a.curveLineColor,
       p = _a.p,
       xBand = _a.xBand,
       pathData = _a.pathData,
@@ -812,13 +820,13 @@ var PathsComponent = function PathsComponent(_a) {
     clipPath: "url(#" + chartId + ")",
     className: styles.paths
   }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("path", {
-    className: ['line--curve', styles.line].join(' '),
+    className: ['line--curve', styles.line, Object(emotion__WEBPACK_IMPORTED_MODULE_4__["css"])(templateObject_1 || (templateObject_1 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n          stroke: ", ";\n        "], ["\n          stroke: ", ";\n        "])), !!curveLineColor ? curveLineColor : theme.colors.text)].join(' '),
     transform: "translate(" + padding + ", 0)",
     ref: function ref(node) {
       Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(node).datum(pathData).attr('d', line);
     }
   }), showVitalFew && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("line", {
-    className: ['line--horizontal', styles.lineCutOff, Object(emotion__WEBPACK_IMPORTED_MODULE_4__["css"])(templateObject_1 || (templateObject_1 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n            stroke: ", ";\n          "], ["\n            stroke: ", ";\n          "])), !!vitalLineColor ? vitalLineColor : 'rgba(255, 0, 0, 0.75)')].join(' '),
+    className: ['line--horizontal', styles.lineCutOff, Object(emotion__WEBPACK_IMPORTED_MODULE_4__["css"])(templateObject_2 || (templateObject_2 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n            stroke: ", ";\n          "], ["\n            stroke: ", ";\n          "])), !!vitalLineColor ? vitalLineColor : theme.palette.brandDanger)].join(' '),
     transform: "translate(" + (padding + xBand.bandwidth() / 2) + ", 0)",
     ref: function ref(node) {
       Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(node).attr('x1', 0).attr('x2', chartWidth - padding).attr('y1', p(vitalBreakpointVal / 100)).attr('y2', p(vitalBreakpointVal / 100));
@@ -883,7 +891,7 @@ var AxisComponent = function AxisComponent(_a) {
     }
   }));
 };
-var templateObject_1;
+var templateObject_1, templateObject_2;
 
 /***/ }),
 
@@ -997,19 +1005,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TooltipComponent", function() { return TooltipComponent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tooltipHandler", function() { return tooltipHandler; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "barClickHandler", function() { return barClickHandler; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "../node_modules/tslib/tslib.es6.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _styles__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./styles */ "./styles.ts");
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3 */ "d3");
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(d3__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _eventBus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./eventBus */ "./eventBus.ts");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./constants */ "./constants.ts");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils */ "./utils.ts");
-/* harmony import */ var emotion__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! emotion */ "emotion");
-/* harmony import */ var emotion__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(emotion__WEBPACK_IMPORTED_MODULE_7__);
-
-
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _styles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./styles */ "./styles.ts");
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3 */ "d3");
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(d3__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _eventBus__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./eventBus */ "./eventBus.ts");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./constants */ "./constants.ts");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils */ "./utils.ts");
 
 
 
@@ -1028,9 +1031,9 @@ var getCopyLabel = function getCopyLabel(_a, text) {
 };
 
 var TooltipComponent = function TooltipComponent(props) {
-  var styles = Object(_styles__WEBPACK_IMPORTED_MODULE_2__["getStyles"])();
-  var tooltipRef = Object(react__WEBPACK_IMPORTED_MODULE_1__["useRef"])(null);
-  var tooltipContentRef = Object(react__WEBPACK_IMPORTED_MODULE_1__["useRef"])(null);
+  var styles = Object(_styles__WEBPACK_IMPORTED_MODULE_1__["getStyles"])();
+  var tooltipRef = Object(react__WEBPACK_IMPORTED_MODULE_0__["useRef"])(null);
+  var tooltipContentRef = Object(react__WEBPACK_IMPORTED_MODULE_0__["useRef"])(null);
 
   var barClickEventHandler = function barClickEventHandler(e) {
     barClickHandler(tooltipRef, props, e);
@@ -1040,18 +1043,18 @@ var TooltipComponent = function TooltipComponent(props) {
     tooltipHandler(tooltipRef, tooltipContentRef, props, e);
   };
 
-  Object(react__WEBPACK_IMPORTED_MODULE_1__["useEffect"])(function () {
-    _eventBus__WEBPACK_IMPORTED_MODULE_4__["eventBus"].on(props.chartId + "-" + _constants__WEBPACK_IMPORTED_MODULE_5__["CONSTANTS"].E_TOOLTIP_CLICK, barClickEventHandler);
-    _eventBus__WEBPACK_IMPORTED_MODULE_4__["eventBus"].on(props.chartId + "-" + _constants__WEBPACK_IMPORTED_MODULE_5__["CONSTANTS"].E_TOOLTIP_MOVE, barMoveEventHandler);
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
+    _eventBus__WEBPACK_IMPORTED_MODULE_3__["eventBus"].on(props.chartId + "-" + _constants__WEBPACK_IMPORTED_MODULE_4__["CONSTANTS"].E_TOOLTIP_CLICK, barClickEventHandler);
+    _eventBus__WEBPACK_IMPORTED_MODULE_3__["eventBus"].on(props.chartId + "-" + _constants__WEBPACK_IMPORTED_MODULE_4__["CONSTANTS"].E_TOOLTIP_MOVE, barMoveEventHandler);
     return function () {
-      _eventBus__WEBPACK_IMPORTED_MODULE_4__["eventBus"].remove(props.chartId + "-" + _constants__WEBPACK_IMPORTED_MODULE_5__["CONSTANTS"].E_TOOLTIP_CLICK, barClickEventHandler);
-      _eventBus__WEBPACK_IMPORTED_MODULE_4__["eventBus"].remove(props.chartId + "-" + _constants__WEBPACK_IMPORTED_MODULE_5__["CONSTANTS"].E_TOOLTIP_MOVE, barMoveEventHandler);
+      _eventBus__WEBPACK_IMPORTED_MODULE_3__["eventBus"].remove(props.chartId + "-" + _constants__WEBPACK_IMPORTED_MODULE_4__["CONSTANTS"].E_TOOLTIP_CLICK, barClickEventHandler);
+      _eventBus__WEBPACK_IMPORTED_MODULE_3__["eventBus"].remove(props.chartId + "-" + _constants__WEBPACK_IMPORTED_MODULE_4__["CONSTANTS"].E_TOOLTIP_MOVE, barMoveEventHandler);
     };
   }, []);
-  return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     ref: tooltipRef,
-    className: ['tooltip__container', styles.tooltipContainer, props.chartId, Object(emotion__WEBPACK_IMPORTED_MODULE_7__["css"])(templateObject_1 || (templateObject_1 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n        "], ["\n        "])))].join(' ')
-  }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+    className: ['tooltip__container', styles.tooltipContainer, props.chartId].join(' ')
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     ref: tooltipContentRef,
     className: styles.tooltip
   }));
@@ -1069,6 +1072,7 @@ var tooltipHandler = function tooltipHandler(tooltipRef, tooltipContentRef, prop
   var _b = ((_a = event.currentTarget) === null || _a === void 0 ? void 0 : _a.dataset) || {},
       labelHeader = _b.labelHeader,
       labelValue = _b.label,
+      label2 = _b.label2,
       isVital = _b.isVital,
       count = _b.count,
       fillColor = _b.fillColor;
@@ -1080,13 +1084,13 @@ var tooltipHandler = function tooltipHandler(tooltipRef, tooltipContentRef, prop
   }
 
   if (!!tooltipDiv) {
-    Object(d3__WEBPACK_IMPORTED_MODULE_3__["select"])(tooltipDiv).classed('tooltip--visible', isVisible);
+    Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(tooltipDiv).classed('tooltip--visible', isVisible);
 
     if (isVisible) {
-      Object(d3__WEBPACK_IMPORTED_MODULE_3__["select"])(tooltipDiv).style('left', event.pageX + "px").style('top', event.pageY - 28 + "px");
+      Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(tooltipDiv).style('left', event.pageX + "px").style('top', event.pageY - 28 + "px");
     }
 
-    Object(d3__WEBPACK_IMPORTED_MODULE_3__["select"])(tooltipContentDiv).style('background', !!fillColor ? fillColor : isVital === 'true' ? !!props.vitalColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_6__["camelCase"])(props.vitalColor) : props.theme.palette.greenBase : !!props.trivialColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_6__["camelCase"])(props.trivialColor) : props.theme.palette.redBase).html("<label class=\"label-header\">" + labelHeader + "\n      " + (!!contents.copyText ? getCopyLabel(props, contents.copyText) : getCopyLabel(props, contents.initCopyText)) + "</label>\n      <label class=\"label-value\">Percentage of sum: " + labelValue + "</label>\n      <strong>" + count + "</strong>\n    ");
+    Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(tooltipContentDiv).style('background', !!fillColor ? fillColor : isVital === 'true' ? !!props.vitalColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_5__["camelCase"])(props.vitalColor) : props.theme.palette.brandDanger : !!props.trivialColor ? Object(_utils__WEBPACK_IMPORTED_MODULE_5__["camelCase"])(props.trivialColor) : props.theme.palette.brandWarning).html("<label class=\"label-header\">" + labelHeader + "\n      " + (!!contents.copyText ? getCopyLabel(props, contents.copyText) : getCopyLabel(props, contents.initCopyText)) + "</label>\n      <label class=\"label-value\">Bar percentage: " + labelValue + "</label>\n      <label class=\"label-value\">Cumulative percentage: " + label2 + "</label>\n      <strong>" + count + "</strong>\n    ");
   }
 };
 var barClickHandler = function barClickHandler(tooltipRef, props, event) {
@@ -1103,10 +1107,9 @@ var barClickHandler = function barClickHandler(tooltipRef, props, event) {
 
   textField.select();
   document.execCommand('copy');
-  Object(d3__WEBPACK_IMPORTED_MODULE_3__["select"])(appendTo).select('.tooltip-copy-label').text(contents.dataCopied);
+  Object(d3__WEBPACK_IMPORTED_MODULE_2__["select"])(appendTo).select('.tooltip-copy-label').text(contents.dataCopied);
   textField.remove();
 };
-var templateObject_1;
 
 /***/ }),
 
@@ -1341,13 +1344,6 @@ var plugin = new _grafana_data__WEBPACK_IMPORTED_MODULE_0__["PanelPlugin"](_Pare
     name: 'Show vital few line',
     description: 'Indicates that many defects come from relatively few causes.',
     defaultValue: true
-  }).addColorPicker({
-    path: 'vitalLineColor',
-    name: 'Breakpoint lines',
-    description: 'Horizontal and vertical lines indicating the vital few breakpoint',
-    showIf: function showIf(c) {
-      return c.showVitalFew;
-    }
   }).addNumberInput({
     path: 'vitalBreakpointVal',
     name: 'Vital few value (%)',
@@ -1365,26 +1361,16 @@ var plugin = new _grafana_data__WEBPACK_IMPORTED_MODULE_0__["PanelPlugin"](_Pare
     defaultValue: false
   }).addNumberInput({
     path: 'valToFixed',
-    name: 'Number of decimals',
+    name: 'Number of decimals (max. 6)',
     description: 'Set number of decimals in bar values.',
     settings: {
-      min: 0
+      min: 0,
+      max: 6
     },
     defaultValue: 2,
     showIf: function showIf(c) {
       return c.showBarValue;
     }
-  }).addColorPicker({
-    path: 'vitalColor',
-    name: 'Vital few color'
-  }).addColorPicker({
-    path: 'trivialColor',
-    name: 'Trivial many color',
-    description: ''
-  }).addColorPicker({
-    path: 'barHoverColor',
-    name: 'Bar hover color',
-    description: 'Set color for bar on hover'
   })
   /**
    * Will add the slider input once implementation is done :)
@@ -1398,11 +1384,34 @@ var plugin = new _grafana_data__WEBPACK_IMPORTED_MODULE_0__["PanelPlugin"](_Pare
       min: 0,
       max: 1
     }
-  }).addBooleanSwitch({
-    path: 'isCopyLabelVisible',
-    name: 'Show copy content label?',
-    description: 'This label below the tooltip hints users to copy content of the entered bar.',
-    defaultValue: true
+  }).addColorPicker({
+    category: ['Colors'],
+    path: 'curveLineColor',
+    name: 'Percentage line',
+    description: 'The curved line visualizing the optimal trade off'
+  }).addColorPicker({
+    category: ['Colors'],
+    path: 'vitalLineColor',
+    name: 'Breakpoint lines',
+    description: 'Horizontal and vertical lines indicating the vital few breakpoint',
+    showIf: function showIf(c) {
+      return c.showVitalFew;
+    }
+  }).addColorPicker({
+    category: ['Colors'],
+    path: 'vitalColor',
+    name: 'Vital few bars',
+    description: 'The bars within the determined vital few percentage'
+  }).addColorPicker({
+    category: ['Colors'],
+    path: 'trivialColor',
+    name: 'Trivial many bars',
+    description: 'The bars outside the vital few percentage'
+  }).addColorPicker({
+    category: ['Colors'],
+    path: 'barHoverColor',
+    name: 'Bar hover state',
+    description: 'Bar fill color on hover'
   });
 });
 
@@ -1436,7 +1445,7 @@ var getStyles = Object(_grafana_ui__WEBPACK_IMPORTED_MODULE_2__["stylesFactory"]
     textBox: Object(emotion__WEBPACK_IMPORTED_MODULE_1__["css"])(templateObject_5 || (templateObject_5 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n      position: absolute;\n      bottom: 0;\n      left: 0;\n      padding: 10px;\n    "], ["\n      position: absolute;\n      bottom: 0;\n      left: 0;\n      padding: 10px;\n    "]))),
     bar: Object(emotion__WEBPACK_IMPORTED_MODULE_1__["css"])(templateObject_6 || (templateObject_6 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n      cursor: pointer;\n\n      &:hover {\n        fill: ", ";\n      }\n    "], ["\n      cursor: pointer;\n\n      &:hover {\n        fill: ", ";\n      }\n    "])), theme.colors.text),
     barValue: Object(emotion__WEBPACK_IMPORTED_MODULE_1__["css"])(templateObject_7 || (templateObject_7 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n      fill: ", ";\n      text-anchor: middle;\n      opacity: 1;\n      transition: opacity 0.2s ease-out;\n      user-select: none;\n    "], ["\n      fill: ", ";\n      text-anchor: middle;\n      opacity: 1;\n      transition: opacity 0.2s ease-out;\n      user-select: none;\n    "])), theme.colors.text),
-    line: Object(emotion__WEBPACK_IMPORTED_MODULE_1__["css"])(templateObject_8 || (templateObject_8 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n      fill: none;\n      stroke: ", ";\n      stroke-width: 2px;\n      shape-rendering: geometricPrecision;\n    "], ["\n      fill: none;\n      stroke: ", ";\n      stroke-width: 2px;\n      shape-rendering: geometricPrecision;\n    "])), theme.colors.text),
+    line: Object(emotion__WEBPACK_IMPORTED_MODULE_1__["css"])(templateObject_8 || (templateObject_8 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n      fill: none;\n      stroke-width: 2px;\n      shape-rendering: geometricPrecision;\n    "], ["\n      fill: none;\n      stroke-width: 2px;\n      shape-rendering: geometricPrecision;\n    "]))),
     lineCutOff: Object(emotion__WEBPACK_IMPORTED_MODULE_1__["css"])(templateObject_9 || (templateObject_9 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n      fill: none;\n      stroke-width: 2px;\n      stroke-dasharray: 5px;\n    "], ["\n      fill: none;\n      stroke-width: 2px;\n      stroke-dasharray: 5px;\n    "]))),
     lineBottomAxis: Object(emotion__WEBPACK_IMPORTED_MODULE_1__["css"])(templateObject_10 || (templateObject_10 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n      // fill: none;\n      stroke: ", ";\n      shape-rendering: crispEdges;\n    "], ["\n      // fill: none;\n      stroke: ", ";\n      shape-rendering: crispEdges;\n    "])), theme.colors.text),
     paths: Object(emotion__WEBPACK_IMPORTED_MODULE_1__["css"])(templateObject_11 || (templateObject_11 = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__makeTemplateObject"])(["\n      position: relative;\n    "], ["\n      position: relative;\n    "]))),

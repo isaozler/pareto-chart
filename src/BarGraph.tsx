@@ -88,6 +88,7 @@ const Component: React.FC<any> = ({
   x,
   xBand,
   y,
+  p,
   chartHeight,
   chartWidth,
   vitalBreakpointVal,
@@ -100,6 +101,7 @@ const Component: React.FC<any> = ({
   vitalLineColor,
   trivialColor,
   barHoverColor,
+  ...props
 }) => {
   let issetVitalFewLine = false;
   const setIssetVitalFewLine = (state: boolean): boolean => {
@@ -113,15 +115,18 @@ const Component: React.FC<any> = ({
   const debouncedClickHandler = debounce(barClickHandler, 200);
   const debouncedMoveHandler = debounce(barMoveHandler, 200);
   const getFillColor = (isVital: boolean) => isVital 
-    ? !!vitalColor ? camelCase(vitalColor) : theme.palette.greenBase
-    : !!trivialColor ? camelCase(trivialColor) : theme.palette.redBase;
+    ? !!vitalColor ? camelCase(vitalColor) : theme.palette.brandDanger
+    : !!trivialColor ? camelCase(trivialColor) : theme.palette.brandWarning;
 
   return (
     <g clipPath={`url(#${chartId})`} className="bars" transform={`translate(${padding}, 0)`}>
       {data.y.map((val: number, i: number) => {
         const currentX: number = x(i) - bandwidth / 2;
         const step = Math.trunc(chartWidth / 10 / bandwidth);
-        const label = typeof val === 'number' && valToFixed >= 0 ? val.toFixed(valToFixed) : val;
+        const defaultFixedVal = 2;
+        const maxFixedVal = 6;
+        const label = typeof val === 'number' 
+          && valToFixed >= 0 ? val.toFixed(valToFixed > maxFixedVal ? defaultFixedVal : valToFixed) : val;
         const isForcedHidden = !showBarValue;
         const visibilityClassName = isForcedHidden ? styles.forcedHidden.__barLabel : '';
         const BarLabel = ({ index, className }: any) => (
@@ -159,6 +164,7 @@ const Component: React.FC<any> = ({
               fill={getFillColor(isVital)}
               data-label-header={data.x[i]}
               data-label={data.tooltipLabel[i]}
+              data-label2={`${data.p[i].toFixed(2)}%`}
               data-count={val}
               data-is-vital={isVital}
               data-fill-color={getFillColor(isVital)}

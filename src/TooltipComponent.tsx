@@ -4,7 +4,6 @@ import { select as d3Select } from 'd3';
 import { eventBus } from './eventBus';
 import { CONSTANTS } from './constants';
 import { camelCase } from './utils';
-import { css } from 'emotion';
 
 const contents = {
   initCopyText: 'Click on bar to copy data',
@@ -37,13 +36,7 @@ export const TooltipComponent = (props: any) => {
   }, []);
 
   return (
-    <div ref={tooltipRef} className={[
-        'tooltip__container',
-        styles.tooltipContainer,
-        props.chartId,
-        css`
-        `,
-      ].join(' ')}>
+    <div ref={tooltipRef} className={['tooltip__container',styles.tooltipContainer,props.chartId,].join(' ')}>
       <div ref={tooltipContentRef} className={styles.tooltip} />
     </div>
   );
@@ -57,7 +50,7 @@ export const tooltipHandler = (
 ) => {
   const { current: tooltipDiv } = tooltipRef || { current: null };
   const { current: tooltipContentDiv } = tooltipContentRef || { current: null };
-  const { labelHeader, label: labelValue, isVital, count, fillColor } = event.currentTarget?.dataset || {};
+  const { labelHeader, label: labelValue, label2, isVital, count, fillColor } = event.currentTarget?.dataset || {};
   const isVisible = ['mouseover', 'mousemove'].includes(event.type) ? true : false;
 
   if (event.type === 'mouseout') {
@@ -76,13 +69,14 @@ export const tooltipHandler = (
     d3Select(tooltipContentDiv).style(
       'background',
       !!fillColor ? fillColor : isVital === 'true'
-        ? !!props.vitalColor ? camelCase(props.vitalColor) : props.theme.palette.greenBase
-        : !!props.trivialColor ? camelCase(props.trivialColor) : props.theme.palette.redBase
+        ? !!props.vitalColor ? camelCase(props.vitalColor) : props.theme.palette.brandDanger
+        : !!props.trivialColor ? camelCase(props.trivialColor) : props.theme.palette.brandWarning
     ).html(`<label class="label-header">${labelHeader}
       ${
         !!contents.copyText ? getCopyLabel(props, contents.copyText) : getCopyLabel(props, contents.initCopyText)
       }</label>
-      <label class="label-value">Percentage of sum: ${labelValue}</label>
+      <label class="label-value">Bar percentage: ${labelValue}</label>
+      <label class="label-value">Cumulative percentage: ${label2}</label>
       <strong>${count}</strong>
     `);
   }
