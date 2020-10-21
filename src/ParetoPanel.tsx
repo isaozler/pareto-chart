@@ -13,7 +13,7 @@ import { getStyles } from './styles';
 
 interface Props extends PanelProps<ParetoOptions> {}
 
-export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) => {
+export const ParetoPanel: React.FC<Props> = ({ options, data, width, height, id }) => {
   const svgRef = useRef(null);
   const theme = useTheme();
   const styles = getStyles();
@@ -22,9 +22,18 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
     return <div className={['placeholder--no-data', styles.placeholder.__noData].join(' ')}>No Data</div>;
   }
 
-  const chartId = `chartMask_${styles.chartMaskId}_${+new Date()}`;
+  const chartId = `chartMask_${id}`;
   const PanelData = new PanelDataController(data);
-  const graphData = PanelData.getResults();
+  const { results: graphData, error } = PanelData.getResults();
+
+  if (!!error || !graphData) {
+    return (
+      <div className={['placeholder--no-data', styles.placeholder.__noData].join(' ')}>
+        {error?.message || 'Invalid data'}
+      </div>
+    );
+  }
+
   const barGraphSettings = { options, width, height };
   const barGraphData = BarGraph(graphData, barGraphSettings);
   const props = {
@@ -51,7 +60,7 @@ export const ParetoPanel: React.FC<Props> = ({ options, data, width, height }) =
       <TooltipComponent {...props} />
       <svg
         ref={svgRef}
-        className={styles.svg}
+        className={['svg--pareto-chart', styles.svg].join(' ')}
         width={width}
         height={height}
         xmlns="http://www.w3.org/2000/svg"

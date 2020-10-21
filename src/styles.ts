@@ -106,13 +106,11 @@ export const getStyles = stylesFactory(() => {
     `,
     line: css`
       fill: none;
-      stroke: ${theme.colors.text};
       stroke-width: 2px;
       shape-rendering: geometricPrecision;
     `,
     lineCutOff: css`
       fill: none;
-      stroke: rgba(255, 0, 0, 0.75);
       stroke-width: 2px;
       stroke-dasharray: 5px;
     `,

@@ -1,14 +1,17 @@
 import React from 'react';
 import { select as d3Select, axisBottom as d3AxisBottom, axisLeft as d3AxisLeft } from 'd3';
-import { tickFilter } from './utils';
+import { css } from 'emotion';
 
 interface PathsComponentInterface {
+  theme: any;
   styles: any;
   padding: number;
   chartId: string;
   chartWidth: number;
   chartHeight: number;
   vitalBreakpointVal: number;
+  vitalLineColor: string;
+  curveLineColor: string;
   x: any;
   p: any;
   y: any;
@@ -25,6 +28,7 @@ interface AxisComponentInterface {
   styles: any;
   line: any;
   vitalBreakpointVal: number;
+  isInclusive: boolean;
   bottomLineData: any;
   chartHeight: number;
   chartWidth: number;
@@ -36,11 +40,14 @@ interface AxisComponentInterface {
 }
 
 export const PathsComponent = ({
+  theme,
   styles,
   padding,
   chartId,
   chartWidth,
   vitalBreakpointVal,
+  vitalLineColor,
+  curveLineColor,
   p,
   xBand,
   pathData,
@@ -50,7 +57,13 @@ export const PathsComponent = ({
   return (
     <g clipPath={`url(#${chartId})`} className={styles.paths}>
       <path
-        className={['line--curve', styles.line].join(' ')}
+        className={[
+          'line--curve',
+          styles.line,
+          css`
+            stroke: ${!!curveLineColor ? curveLineColor : theme.colors.text};
+          `,
+        ].join(' ')}
         transform={`translate(${padding}, 0)`}
         ref={node => {
           d3Select(node)
@@ -60,7 +73,13 @@ export const PathsComponent = ({
       />
       {showVitalFew && (
         <line
-          className={['line--horizontal', styles.lineCutOff].join(' ')}
+          className={[
+            'line--horizontal',
+            styles.lineCutOff,
+            css`
+              stroke: ${!!vitalLineColor ? vitalLineColor : theme.palette.brandDanger};
+            `,
+          ].join(' ')}
           transform={`translate(${padding + xBand.bandwidth() / 2}, 0)`}
           ref={node => {
             d3Select(node)
@@ -87,9 +106,11 @@ export const AxisComponent = ({
   p,
   pLabels,
   vitalBreakpointVal,
+  isInclusive,
 }: AxisComponentInterface) => {
   const hasVitals = !!data.p.filter((d: number) => d < vitalBreakpointVal).length;
   const isVital = (_: any, i: number) => data.p[i] < vitalBreakpointVal || (!hasVitals && i === 0);
+  const pList = data.p.filter(isVital).sort((a: number, b: number) => a - b);
 
   return (
     <g className={['axis', styles.axis].join(' ')}>
@@ -97,10 +118,13 @@ export const AxisComponent = ({
         className="axis-bottom"
         transform={`translate(${padding}, ${chartHeight + 15})`}
         ref={node => {
-          const [highestVitalFewValue] = data.p.filter(isVital).sort((a: number, b: number) => b - a);
-          const i: number = data.p.findIndex((pV: number) => pV === highestVitalFewValue);
-          const filterHandler = tickFilter(data.xAxisLabels[i + 1], data.p.length - 1);
-          const xPAxis = d3AxisBottom(xPBand).tickValues(data.xAxisLabels.filter(filterHandler));
+          const [breakpointXLabel] = data.xAxisLabels
+            .filter(
+              (_: string, index: number) =>
+                !!pList[index] || (isInclusive && pList[index - 1] < vitalBreakpointVal && !pList[index + 1])
+            )
+            .reverse();
+          const xPAxis = d3AxisBottom(xPBand).tickValues([breakpointXLabel, '100 %']);
 
           d3Select(node)
             .call(xPAxis as any)
