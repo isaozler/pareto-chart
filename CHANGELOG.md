@@ -1,5 +1,9 @@
 # Change Log
 
+# Version 0.3.1
+
+- Signed plugin
+
 # Version 0.3.0
 
 - added styling to charts
