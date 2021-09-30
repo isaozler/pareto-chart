@@ -9,16 +9,11 @@ import {
   curveBasis as d3LineCurve,
 } from 'd3';
 import { css } from 'emotion';
-import { GraphData } from './controllers';
-import { getTextLabelClass, debounce, camelCase } from './utils';
-import { eventBus } from './eventBus';
-import { CONSTANTS } from './constants';
-
-export interface BarGraphSettings {
-  options: any;
-  width: number;
-  height: number;
-}
+import { GraphData } from '../helpers/schema';
+import { getTextLabelClass, debounce, camelCase } from '../helpers/utils';
+import { eventBus } from '../helpers/eventBus';
+import { CONSTANTS } from '../helpers/constants';
+import { BarGraphSettings } from 'helpers/schema';
 
 export function BarGraph(data: GraphData, { options, width, height }: BarGraphSettings) {
   const { vitalBreakpointVal } = options;
@@ -40,7 +35,7 @@ export function BarGraph(data: GraphData, { options, width, height }: BarGraphSe
   const p = d3ScaleLinear().range([chartHeight, 0]);
   const line = d3Line()
     .curve(d3LineCurve)
-    .x((d, i) => x(i) || 0)
+    .x((_, i) => x(i) || 0)
     .y((d: any) => (!!d ? p(d.p / 100) : d));
   const pLabels = (n: any, index: number): string => {
     if (index === 0 || !n || !!!n) {
@@ -88,7 +83,6 @@ const Component: React.FC<any> = ({
   x,
   xBand,
   y,
-  p,
   chartHeight,
   chartWidth,
   vitalBreakpointVal,

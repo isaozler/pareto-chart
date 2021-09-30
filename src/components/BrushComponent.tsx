@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useEffect, useCallback } from 'react';
-import { getStyles } from './styles';
+import { getStyles } from '../styles';
 import {
   select as d3Select,
   scaleLinear as d3ScaleLinear,
@@ -8,7 +8,7 @@ import {
   event as d3Event,
   axisLeft as d3AxisLeft,
 } from 'd3';
-import { getTextLabelClass } from './utils';
+import { getTextLabelClass } from '../helpers/utils';
 
 export const BrushComponent = (props: any) => {
   const styles = getStyles();
@@ -53,12 +53,20 @@ export const BrushComponent = (props: any) => {
     const svg = d3Select(props.svgRef.current);
     const { selection } = d3Event || {};
 
-    if (!initXDomain || !initBandWidth) {
+    if (!svg || !selection) {
+      return;
+    }
+
+    if (!initXDomain || !initBandWidth || !selection) {
       initXDomain = props.x.domain();
       initBandWidth = props.xBand.bandwidth();
     }
 
-    if (!!selection) {
+    if (selection?.length) {
+      const [brushStartPosX] = selection;
+      const axisWidth = props.chartWidth - props.padding;
+      const positionX1Percentage = (brushStartPosX * 100) / axisWidth;
+
       props.x.domain(selection.map(props.xLinear.invert, props.xLinear));
 
       const barCount = props.data.xAxisLabels.length;
@@ -73,14 +81,17 @@ export const BrushComponent = (props: any) => {
       }
 
       lastSelection = selection;
+      const startIndex = Math.floor((positionX1Percentage * barCount) / 100);
+      const highestValueVisible = props.data.y[startIndex || 0];
+
       const initWidth = props.chartWidth - props.padding;
       const newEndRange = (100 / percentage) * initWidth;
 
+      props.y.domain([0, highestValueVisible]);
       props.xBand
         .range([0, newEndRange])
         .padding(props.barPadding)
         .domain(props.data.xAxisLabels);
-      props.xBand.domain(props.data.xAxisLabels);
     } else {
       if (!idleTimeout) {
         idleTimeout = setTimeout(idled, idleDelay);
@@ -98,6 +109,7 @@ export const BrushComponent = (props: any) => {
     }
     zoom();
   };
+
   const brush = d3BrushX()
     .extent([
       [0, 0],

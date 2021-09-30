@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="47px" height="52px" viewBox="0 0 47 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 4</title>
+    <g id="cb-manager" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="dashboard.index:step2:0" transform="translate(-510.000000, -335.000000)">
+            <g id="Group-2" transform="translate(473.000000, 312.000000)">
+                <g id="Group-4" transform="translate(39.000000, 25.000000)">
+                    <polygon id="Path-2" fill="#00FF8D" points="20.4732372 10.6165771 8.49255371 15.7437005 8.49255371 32.9790223 20.4732372 38.6165771 34.4925537 32.1016935 34.4925537 16.740379"></polygon>
+                    <circle id="Oval-Copy-2" stroke="#212121" stroke-width="3.41" stroke-linecap="round" stroke-linejoin="round" cx="11" cy="42" r="4"></circle>
+                    <circle id="Oval-Copy-6" stroke="#212121" stroke-width="3.41" stroke-linecap="round" stroke-linejoin="round" cx="25" cy="4" r="4"></circle>
+                    <polyline id="Path-Copy" stroke="#212121" stroke-width="3.41" stroke-linecap="round" stroke-linejoin="round" points="12 5 0 10.277962 0 37.0191939 6.41870117 40.0854492"></polyline>
+                    <polyline id="Path-Copy-2" stroke="#212121" stroke-width="3.41" stroke-linecap="round" stroke-linejoin="round" points="29.8637695 6.5871582 43 12.4599609 43 36.9550781 22.5 47.3261719 22.5 20.5 0.5 10.5"></polyline>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

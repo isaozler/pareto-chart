@@ -1,9 +1,9 @@
 import React, { useRef, useEffect } from 'react';
-import { getStyles } from './styles';
 import { select as d3Select } from 'd3';
-import { eventBus } from './eventBus';
-import { CONSTANTS } from './constants';
-import { camelCase } from './utils';
+import { eventBus } from '../helpers/eventBus';
+import { CONSTANTS } from '../helpers/constants';
+import { camelCase } from '../helpers/utils';
+import { getStyles } from '../styles';
 
 const contents = {
   initCopyText: 'Click on bar to copy data',
