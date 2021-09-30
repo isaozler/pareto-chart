@@ -1,15 +1,5 @@
 import { FieldType } from '@grafana/data';
-export interface GraphData {
-  x: string[];
-  y: number[];
-  p: number[];
-  [key: string]: any;
-}
-
-interface Error {
-  message: string;
-}
-
+import { DataFrame, Error, GraphData } from 'helpers/schema';
 export class PanelDataController {
   dataType: string;
   results: GraphData | null;
@@ -17,17 +7,20 @@ export class PanelDataController {
 
   constructor(data: any) {
     const [target] = data.request.targets;
-    const { resultFormat } = target;
+    const { resultFormat, refId } = target;
     const [serie] = data.series;
     const { fields, meta } = serie;
     this.error = null;
 
-    if (!!meta && !!meta.executedQueryString && resultFormat !== 'time_series') {
+    if (meta?.executedQueryString && resultFormat !== 'time_series') {
       this.dataType = 'table';
       this.results = this.setTableData(fields);
     } else if (resultFormat === 'time_series') {
       this.dataType = 'series';
-      this.results = this.setTimeSeriesData(data.series);
+      this.results =
+        !serie?.name || refId.toLowerCase() === 'flux'
+          ? (this.results = this.setTimeSeriesFluxData(fields))
+          : this.setTimeSeriesData(data.series);
     } else {
       this.dataType = 'series';
       this.results = this.setSeriesData(fields);
@@ -57,7 +50,7 @@ export class PanelDataController {
   }
 
   private setTimeSeriesData(series: any) {
-    const xValues: string[] = series.map(({ name }: { name: string }) => this.stripName(name));
+    const xValues: string[] = series.map((dataFrame: DataFrame, index: number) => this.stripName(dataFrame, index));
     const yValues: number[] = series.map(({ fields }: { fields: any }) => {
       const [, val]: [any, any] = fields;
       const [response]: [number] = val.values.toArray();
@@ -66,15 +59,33 @@ export class PanelDataController {
     return this.setResults(xValues, yValues, this.sumYVals(yValues));
   }
 
-  private sumYVals(vals: number[]) {
-    return vals.reduce((a, d) => a + d, 0);
+  private setTimeSeriesFluxData(fields: any) {
+    const yData = fields.find(({ type }: { type: string }) => type === FieldType.number);
+    const yValues: number[] = yData?.values?.toArray() || [];
+
+    let xData = fields.find(({ type }: { type: string }) => type === FieldType.string);
+
+    if (!xData) {
+      xData = fields.find(({ type }: { type: string }) => type === FieldType.time);
+    }
+
+    const xValues: string[] =
+      xData?.values?.toArray().map((d: any) => `${d}`) ||
+      Array.from({ length: yValues?.length || 0 }).map((i, index) => `T${index + 1}`);
+
+    return this.setResults(xValues, yValues, this.sumYVals(yValues));
   }
 
-  private stripName(name: string) {
-    const string = name.match(/\{.*:+(.*)\}/);
+  private sumYVals(vals: number[]) {
+    return vals?.reduce((a, d) => a + d, 0);
+  }
+
+  private stripName(dataFrame: DataFrame, index: number) {
+    const { name } = dataFrame || {};
+    const string = name?.match(/\{.*:+(.*)\}/) || null;
 
     if (!string) {
-      return name;
+      return index + 1;
     }
 
     const [fullTagName, tagName] = string;
@@ -93,6 +104,12 @@ export class PanelDataController {
       this.results = null;
       this.error = {
         message: 'Column "counts" contains negative values',
+      };
+      return this.results;
+    } else if (!yValues?.length) {
+      this.results = null;
+      this.error = {
+        message: 'Please check your query. There is no data available!',
       };
       return this.results;
     }

@@ -1,12 +1,13 @@
 {
   "name": "isaozler-paretochart-panel",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A Pareto Chart plugin for Grafana",
   "scripts": {
-    "build": "grafana-toolkit plugin:build",
+    "build": "yarn lint && grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch",
+    "lint": "prettier ./src/**/*.{ts,tsx,scss} --write --ignore-unknown",
     "deploy": "yarn build && cp -r ./dist ./pareto-chart && zip pareto-chart.zip -r ./pareto-chart && rm -Rf ./pareto-chart"
   },
   "repository": "github:grafana/pareto-chart",
@@ -21,7 +22,8 @@
     "@grafana/toolkit": "7.0.1",
     "@grafana/ui": "7.0.1",
     "@types/d3": "^5.7.2",
-    "emotion": "10.0.27"
+    "emotion": "10.0.27",
+    "tslib": "^2.3.1"
   },
   "engines": {
     "node": ">=12 <13"

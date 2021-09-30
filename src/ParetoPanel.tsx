@@ -1,17 +1,14 @@
 import React, { useRef } from 'react';
-import { PanelProps } from '@grafana/data';
-import { ParetoOptions } from 'types';
 import { css, cx } from 'emotion';
 import { useTheme } from '@grafana/ui';
 import { select as d3Select } from 'd3';
-import { BarGraph } from './BarGraph';
-import { BrushComponent } from './BrushComponent';
-import { TooltipComponent } from './TooltipComponent';
-import { PathsComponent, AxisComponent } from './GraphComponents';
-import { PanelDataController } from './controllers';
+import { BarGraph } from './components/BarGraph';
+import { BrushComponent } from './components/BrushComponent';
+import { TooltipComponent } from './components/TooltipComponent';
+import { PathsComponent, AxisComponent } from './components/GraphComponents';
+import { PanelDataController } from './components/controllers';
 import { getStyles } from './styles';
-
-interface Props extends PanelProps<ParetoOptions> {}
+import { Props } from 'helpers/schema';
 
 export const ParetoPanel: React.FC<Props> = ({ options, data, width, height, id }) => {
   const svgRef = useRef(null);

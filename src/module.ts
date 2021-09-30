@@ -1,5 +1,5 @@
 import { PanelPlugin } from '@grafana/data';
-import { ParetoOptions } from './types';
+import { ParetoOptions } from './helpers/types';
 import { ParetoPanel } from './ParetoPanel';
 
 export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOptions(builder => {

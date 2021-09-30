@@ -1,43 +1,7 @@
 import React from 'react';
 import { select as d3Select, axisBottom as d3AxisBottom, axisLeft as d3AxisLeft } from 'd3';
 import { css } from 'emotion';
-
-interface PathsComponentInterface {
-  theme: any;
-  styles: any;
-  padding: number;
-  chartId: string;
-  chartWidth: number;
-  chartHeight: number;
-  vitalBreakpointVal: number;
-  vitalLineColor: string;
-  curveLineColor: string;
-  x: any;
-  p: any;
-  y: any;
-  xBand: any;
-  pathData: any;
-  line: any;
-  showVitalFew: boolean;
-  cutOffXPathData: any;
-}
-
-interface AxisComponentInterface {
-  data: any;
-  padding: number;
-  styles: any;
-  line: any;
-  vitalBreakpointVal: number;
-  isInclusive: boolean;
-  bottomLineData: any;
-  chartHeight: number;
-  chartWidth: number;
-  x: any;
-  y: any;
-  p: any;
-  pLabels: any;
-  xPBand: any;
-}
+import { AxisComponentInterface, PathsComponentInterface } from 'helpers/schema';
 
 export const PathsComponent = ({
   theme,
