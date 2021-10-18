@@ -62,10 +62,17 @@ export const BrushComponent = (props: any) => {
       initBandWidth = props.xBand.bandwidth();
     }
 
+    /**
+     * @TBD
+     * all commented lines considered and updated accordingly
+     * changing the left y bar only will not be accurate because the bar heights
+     * are not changing
+     */
+
     if (selection?.length) {
-      const [brushStartPosX] = selection;
-      const axisWidth = props.chartWidth - props.padding;
-      const positionX1Percentage = (brushStartPosX * 100) / axisWidth;
+      // const [brushStartPosX] = selection;
+      // const axisWidth = props.chartWidth - props.padding;
+      // const positionX1Percentage = (brushStartPosX * 100) / axisWidth;
 
       props.x.domain(selection.map(props.xLinear.invert, props.xLinear));
 
@@ -81,13 +88,13 @@ export const BrushComponent = (props: any) => {
       }
 
       lastSelection = selection;
-      const startIndex = Math.floor((positionX1Percentage * barCount) / 100);
-      const highestValueVisible = props.data.y[startIndex || 0];
+      // const startIndex = Math.floor((positionX1Percentage * barCount) / 100);
+      // const highestValueVisible = props.data.y[startIndex || 0];
 
       const initWidth = props.chartWidth - props.padding;
       const newEndRange = (100 / percentage) * initWidth;
 
-      props.y.domain([0, highestValueVisible]);
+      // props.y.domain([0, highestValueVisible]);
       props.xBand
         .range([0, newEndRange])
         .padding(props.barPadding)
@@ -154,6 +161,17 @@ export const BrushComponent = (props: any) => {
             .transition(transition)
             .attr('x', newCurrentX)
             .attr('width', bandWidth);
+
+          if (props.showBarText) {
+            d3Select(`#barTextGroup-${i}`)
+              .transition(transition)
+              .style(
+                'transform',
+                `translate(${newCurrentX + bandWidth50}px, ${props.chartHeight - 10}px) rotate(${
+                  props.barTextRotation
+                }deg)`
+              );
+          }
 
           if (props.showVitalFew && i === allBarEls.size() - 1) {
             const xPos = props.x(showVitalVerticalLineIndex) - bandWidth50 + bandWidth50;

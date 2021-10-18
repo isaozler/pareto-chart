@@ -104,6 +104,14 @@ export const getStyles = stylesFactory(() => {
       transition: opacity 0.2s ease-out;
       user-select: none;
     `,
+    barTextGroup: css``,
+    barText: css`
+      fill: ${theme.colors.text};
+      opacity: 1;
+      transition: opacity 0.2s ease-out;
+      user-select: none;
+      font-size: 12px;
+    `,
     line: css`
       fill: none;
       stroke-width: 2px;

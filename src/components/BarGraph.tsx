@@ -22,12 +22,13 @@ export function BarGraph(data: GraphData, { options, width, height }: BarGraphSe
   const padding = 20;
   const chartHeight = height - 3 * padding;
   const chartWidth = width - 2 * padding;
+  const barPadding = options.barPadding < 1 ? options.barPadding : options.barPadding / 10;
   const xBand = d3ScaleBand()
     .range([0, chartWidth - padding])
-    .padding(options.barPadding);
+    .padding(barPadding);
   const xPBand = d3ScaleBand()
     .range([0, chartWidth - padding])
-    .padding(options.barPadding)
+    .padding(barPadding)
     .paddingOuter(0.6);
   const xLinear = d3ScaleLinear().range([0, chartWidth - padding]);
   const x = d3ScaleLinear().range([0, chartWidth - padding]);
@@ -86,15 +87,19 @@ const Component: React.FC<any> = ({
   chartHeight,
   chartWidth,
   vitalBreakpointVal,
+  barTextFontSize,
+  barTextRotation,
   isInclusive,
   showVitalFew,
   showBarValue,
+  showBarText,
   valToFixed,
   chartId,
   vitalColor,
   vitalLineColor,
   trivialColor,
   barHoverColor,
+  barLabelColor,
 }) => {
   const hasVitals = !!data.p.filter((d: number, i: number) => d < vitalBreakpointVal).length;
   const bandwidth = xBand.bandwidth() * 0.9;
@@ -111,6 +116,7 @@ const Component: React.FC<any> = ({
       ? camelCase(trivialColor)
       : theme.palette.brandWarning;
   let showVitalVerticalLineIndex = 0;
+  const maxValueOffset = Math.max(...data.y).toString().length * barTextFontSize + 20;
 
   return (
     <g clipPath={`url(#${chartId})`} className="bars" transform={`translate(${padding}, 0)`}>
@@ -135,6 +141,42 @@ const Component: React.FC<any> = ({
           >
             {label}
           </text>
+        );
+        const BarText = ({ index, className, x: propX }: any) => (
+          <g
+            id={`barTextGroup-${index}`}
+            className={styles.barTextGroup}
+            ref={node => {
+              d3Select(node).style(
+                'transform',
+                `translate(${propX + bandwidth / 2 + barTextFontSize / 2}px, ${chartHeight -
+                  10}px) rotate(${barTextRotation}deg)`
+              );
+            }}
+          >
+            <text
+              data-index={index}
+              className={[className, styles.barText].join(' ')}
+              style={{
+                fontSize: `${barTextFontSize}px`,
+                fill: barLabelColor,
+                fontWeight: 'bold',
+              }}
+            >
+              {val}
+            </text>
+            <text
+              data-index={index}
+              className={[className, styles.barText].join(' ')}
+              style={{
+                fontSize: `${barTextFontSize}px`,
+                fill: barLabelColor,
+                transform: `translate(${maxValueOffset}px, 0)`,
+              }}
+            >
+              {data.x[i]} - {data.tooltipLabel[i]}
+            </text>
+          </g>
         );
         let isVital;
 
@@ -197,6 +239,7 @@ const Component: React.FC<any> = ({
               }}
             />
             <BarLabel index={i} className={['bar-values', textLabelClass].join(' ')} />
+            {showBarText ? <BarText index={i} className={['bar-text'].join(' ')} x={currentX} /> : <></>}
             <>
               {showVitalFew && i === data.y.length - 1 && (
                 <line

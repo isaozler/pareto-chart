@@ -29,6 +29,24 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
         description: 'Show the bar values on top of the bars?',
         defaultValue: false,
       })
+      .addBooleanSwitch({
+        path: 'showBarText',
+        name: 'Show bar labels',
+        description: 'Show the bar label?',
+        defaultValue: false,
+      })
+      .addNumberInput({
+        path: 'barTextFontSize',
+        name: 'Bar label font size',
+        description: 'Font size for the bar label.',
+        defaultValue: 12,
+      })
+      .addNumberInput({
+        path: 'barTextRotation',
+        name: 'Bar label rotation',
+        description: 'Rotation degree of the label',
+        defaultValue: 270,
+      })
       .addNumberInput({
         path: 'valToFixed',
         name: 'Number of decimals (max. 6)',
@@ -46,11 +64,11 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
       .addNumberInput({
         path: 'barPadding',
         name: 'Bar padding',
-        description: 'Space between bars. Should be a value between 0 and 1.',
-        defaultValue: 0.2,
+        description: 'Space between bars. Should be a value between 1 and 9.',
+        defaultValue: 2,
         settings: {
-          min: 0,
-          max: 1,
+          min: 1,
+          max: 9,
         },
       })
       .addColorPicker({
@@ -72,6 +90,13 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
         path: 'vitalColor',
         name: 'Vital few bars',
         description: 'The bars within the determined vital few percentage',
+        // defaultValue: theme.palette.brandDanger,
+      })
+      .addColorPicker({
+        category: ['Colors'],
+        path: 'barLabelColor',
+        name: 'Bar label color',
+        description: 'Color or the bar label',
         // defaultValue: theme.palette.brandDanger,
       })
       .addColorPicker({
