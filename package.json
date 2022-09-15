@@ -3,7 +3,7 @@
   "version": "0.3.3",
   "description": "A Pareto Chart plugin for Grafana",
   "scripts": {
-    "build": "yarn lint && grafana-toolkit plugin:build",
+    "build": "yarn lint && grafana-toolkit plugin:build && npx @grafana/toolkit plugin:sign",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch",
