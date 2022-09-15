@@ -5,6 +5,7 @@
 This plugin provides you the ability to draw a Pareto chart with `RDB` and `TimeSeries databases`.
 
 ## Features
+- Setting a custom background color to the tooltip overlay
 - Configurable vital few and trivial many lines
 - Pan and zoom for detailed info without changing date range
 - Set decimals count on displayed values

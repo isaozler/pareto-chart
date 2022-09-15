@@ -1,6 +1,6 @@
 {
   "name": "isaozler-paretochart-panel",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A Pareto Chart plugin for Grafana",
   "scripts": {
     "build": "yarn lint && grafana-toolkit plugin:build",

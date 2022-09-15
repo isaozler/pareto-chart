@@ -15,9 +15,12 @@ export const getStyles = stylesFactory(() => {
     `,
     tooltipContainer: css`
       position: fixed;
+      top: 0;
+      right: 0;
       z-index: 100;
       min-width: 20vw;
       display: flex;
+      justify-content: flex-end;
       transition: all 0.2s ease;
 
       &:not(.tooltip--visible) {
@@ -31,39 +34,41 @@ export const getStyles = stylesFactory(() => {
       }
     `,
     tooltip: css`
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      border: 1px solid ${theme.colors.border2};
-      padding: 4px 10px;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
       max-width: 100%;
       color: white;
 
       strong {
-        position: absolute;
-        top: -1px;
-        left: 100%;
-        padding: 4px;
+        padding: 8px 10px;
+        margin-top: 4px;
         bottom: -1px;
         min-width: 50px;
-        text-align: center;
         background: inherit;
-        border: 1px solid ${theme.colors.border2};
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background: rgba(0, 0, 0, 0.14);
         font-size: 1.4rem;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
 
       label {
         display: block;
         background: inherit;
-        padding: 0 0 4px 0;
+        padding: 0 10px 4px 10px;
+
+        &:last-of-type {
+          padding-bottom: 0;
+        }
 
         &.label-header {
           font-weight: bold;
           font-size: 1.2rem;
           max-width: 100%;
+          background: rgba(0, 0, 0, 0.1);
+          padding: 8px 10px;
+          margin-bottom: 4px;
         }
       }
 
@@ -123,7 +128,6 @@ export const getStyles = stylesFactory(() => {
       stroke-dasharray: 5px;
     `,
     lineBottomAxis: css`
-      // fill: none;
       stroke: ${theme.colors.text};
       shape-rendering: crispEdges;
     `,

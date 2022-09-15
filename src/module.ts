@@ -113,5 +113,11 @@ export const plugin = new PanelPlugin<ParetoOptions>(ParetoPanel).setPanelOption
         description: 'Bar fill color on hover',
         // defaultValue: theme.palette.brandSuccess,
       })
+      .addColorPicker({
+        category: ['Colors'],
+        path: 'tooltipBackgroundColor',
+        name: 'Custom tooltip background color',
+        description: 'To specify a background color instead of hovered bar color. Refresh to apply color changes.',
+      })
   );
 });

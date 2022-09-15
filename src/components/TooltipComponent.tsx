@@ -52,6 +52,7 @@ export const tooltipHandler = (
   const { current: tooltipContentDiv } = tooltipContentRef || { current: null };
   const { labelHeader, label: labelValue, label2, isVital, count, fillColor } = event.currentTarget?.dataset || {};
   const isVisible = ['mouseover', 'mousemove'].includes(event.type) ? true : false;
+  const axisRightWidth = (d3Select('.axis-right').node() as HTMLDivElement)?.getBoundingClientRect()?.width + 20 || 60;
 
   if (event.type === 'mouseout') {
     contents.copyText = contents.initCopyText;
@@ -61,28 +62,30 @@ export const tooltipHandler = (
     d3Select(tooltipDiv).classed('tooltip--visible', isVisible);
 
     if (isVisible) {
-      d3Select(tooltipDiv)
-        .style('left', `${event.pageX}px`)
-        .style('top', `${event.pageY - 28}px`);
+      d3Select(tooltipDiv).style('right', `${axisRightWidth}px`);
     }
 
-    d3Select(tooltipContentDiv).style(
-      'background',
-      !!fillColor
-        ? fillColor
-        : isVital === 'true'
-        ? !!props.vitalColor
-          ? camelCase(props.vitalColor)
-          : props.theme.palette.brandDanger
-        : !!props.trivialColor
-        ? camelCase(props.trivialColor)
-        : props.theme.palette.brandWarning
-    ).html(`<label class="label-header">${labelHeader}
+    let backgroundColor = !!fillColor
+      ? fillColor
+      : isVital === 'true'
+      ? !!props.vitalColor
+        ? camelCase(props.vitalColor)
+        : props.theme.palette.brandDanger
+      : !!props.trivialColor
+      ? camelCase(props.trivialColor)
+      : props.theme.palette.brandWarning;
+
+    if (props.tooltipBackgroundColor) {
+      backgroundColor = props.tooltipBackgroundColor;
+    }
+
+    d3Select(tooltipContentDiv).style('background', backgroundColor)
+      .html(`<div class="labels-wrapper"><label class="label-header">${labelHeader}
       ${
         !!contents.copyText ? getCopyLabel(props, contents.copyText) : getCopyLabel(props, contents.initCopyText)
       }</label>
       <label class="label-value">Bar percentage: ${labelValue}</label>
-      <label class="label-value">Cumulative percentage: ${label2}</label>
+      <label class="label-value">Cumulative percentage: ${label2}</label></div>
       <strong>${count}</strong>
     `);
   }
