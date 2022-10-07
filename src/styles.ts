@@ -14,7 +14,7 @@ export const getStyles = stylesFactory(() => {
       left: 0;
     `,
     tooltipContainer: css`
-      position: fixed;
+      position: absolute;
       top: 0;
       right: 0;
       z-index: 100;

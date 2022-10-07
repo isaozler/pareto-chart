@@ -1,5 +1,8 @@
 # Change Log
 
+# Version 0.3.4
+- Tooltip position bug fixed
+
 # Version 0.3.3
 - Tooltip bug fixes
 - Tooltip overlay background color feature
